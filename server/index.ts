@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { storage } from "./storage";
 
 const app = express();
 app.use(express.json());
@@ -21,7 +22,9 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      
+      // Only log response bodies in development to prevent sensitive data leaks
+      if (process.env.NODE_ENV === "development" && capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
@@ -38,6 +41,16 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+  
+  // Initialize sample data for development
+  if (app.get("env") === "development") {
+    try {
+      await (storage as any).initializeSampleData?.();
+      log("Sample data initialized");
+    } catch (error) {
+      log("Error initializing sample data:", error);
+    }
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
