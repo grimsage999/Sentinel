@@ -1,9 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
-import { Shield, Globe, Zap, CheckCircle, ChevronRight, Flag, Search } from "lucide-react";
+import { Shield, Globe, Zap, CheckCircle, ChevronRight, Flag, Search, Link2, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { api } from "@/lib/api";
 import type { Alert, ThreatIntelligence } from "@shared/schema";
+
+interface CorrelationResult {
+  correlation: {
+    id: string;
+    primaryAlertId: string;
+    relatedAlertId: string;
+    correlationType: string;
+    confidence: number;
+    correlationData: any;
+    createdAt: Date;
+  };
+  primaryAlert: Alert;
+  relatedAlert: Alert;
+  correlationStrength: number;
+}
+
+interface CorrelationAnalysis {
+  alertId: string;
+  correlations: CorrelationResult[];
+  totalScore: number;
+  riskLevel: "Low" | "Medium" | "High" | "Critical";
+  patterns: string[];
+}
 
 interface AlertDetailsProps {
   alert: Alert | null;
@@ -14,6 +38,12 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
   const { data: threatIntel, isLoading: threatIntelLoading } = useQuery({
     queryKey: ["/api/threat-intelligence", alert?.id],
     queryFn: () => api.getThreatIntelligence(alert!.id),
+    enabled: !!alert
+  });
+
+  const { data: correlationAnalysis, isLoading: correlationLoading } = useQuery<CorrelationAnalysis>({
+    queryKey: ["/api/correlations", alert?.id],
+    queryFn: () => api.getCorrelationAnalysis(alert!.id),
     enabled: !!alert
   });
 
@@ -39,6 +69,12 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
       'Low': 'bg-blue-500/10 text-blue-500 border-blue-500/20'
     };
     return colors[severity] || 'bg-gray-500/10 text-gray-500';
+  };
+
+  const getConfidenceColor = (confidence: number) => {
+    if (confidence >= 80) return 'text-green-500'; // High confidence
+    if (confidence >= 60) return 'text-yellow-500'; // Medium confidence
+    return 'text-red-500'; // Low confidence
   };
 
   const workflowSteps = [
@@ -94,7 +130,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
             </div>
             <div className="bg-card p-3 rounded-lg border border-border">
               <p className="text-xs text-muted-foreground">Confidence</p>
-              <p className="font-semibold text-green-500" data-testid={`text-alert-confidence-${alert.id}`}>
+              <p className={`font-semibold ${getConfidenceColor(alert.confidence || 0)}`} data-testid={`text-alert-confidence-${alert.id}`}>
                 {alert.confidence}%
               </p>
             </div>
@@ -208,6 +244,122 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
             )}
           </div>
         ) : null}
+
+        {/* Correlation Analysis */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold mb-4 flex items-center">
+            <Link2 className="w-5 h-5 mr-2 text-primary" />
+            Correlation Analysis
+          </h2>
+          {correlationLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-16 w-full" />
+              <Skeleton className="h-16 w-full" />
+            </div>
+          ) : correlationAnalysis ? (
+            <div className="space-y-4">
+              {/* Risk Assessment */}
+              <div className="bg-card p-4 rounded-lg border border-border">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold">Risk Assessment</h3>
+                  <div className="flex items-center space-x-3">
+                    <Badge 
+                      variant={
+                        correlationAnalysis.riskLevel === "Critical" ? "destructive" :
+                        correlationAnalysis.riskLevel === "High" ? "secondary" : 
+                        "outline"
+                      }
+                      data-testid={`text-risk-level-${alert.id}`}
+                    >
+                      <AlertTriangle className="w-3 h-3 mr-1" />
+                      {correlationAnalysis.riskLevel} Risk
+                    </Badge>
+                    <span className="text-sm text-muted-foreground" data-testid={`text-total-score-${alert.id}`}>
+                      Score: {correlationAnalysis.totalScore}/100
+                    </span>
+                  </div>
+                </div>
+                
+                {correlationAnalysis.patterns && correlationAnalysis.patterns.length > 0 && (
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-2">Detected Patterns:</p>
+                    <ul className="space-y-1">
+                      {correlationAnalysis.patterns.map((pattern, idx) => (
+                        <li key={idx} className="text-sm text-amber-400 flex items-center">
+                          <ChevronRight className="w-3 h-3 mr-1" />
+                          {pattern}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Related Alerts */}
+              {correlationAnalysis.correlations && correlationAnalysis.correlations.length > 0 ? (
+                <div>
+                  <h3 className="font-semibold mb-3">Related Alerts ({correlationAnalysis.correlations.length})</h3>
+                  <div className="space-y-3">
+                    {correlationAnalysis.correlations.slice(0, 5).map((correlation, idx) => (
+                      <div key={idx} className="bg-card p-3 rounded-lg border border-border">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center space-x-2">
+                            <Badge variant="outline" className="text-xs">
+                              {correlation.correlation.correlationType.replace('_', ' ').toUpperCase()}
+                            </Badge>
+                            <span className="font-mono text-xs text-muted-foreground">
+                              {correlation.relatedAlert.id}
+                            </span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs text-muted-foreground">
+                              Confidence: {correlation.correlation.confidence}%
+                            </span>
+                            <div className={`w-2 h-2 rounded-full ${
+                              correlation.correlation.confidence >= 80 ? 'bg-green-500' :
+                              correlation.correlation.confidence >= 60 ? 'bg-yellow-500' :
+                              'bg-red-500'
+                            }`}></div>
+                          </div>
+                        </div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium">{correlation.relatedAlert.title}</h4>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {correlation.relatedAlert.source} • {correlation.relatedAlert.severity}
+                            </p>
+                            {correlation.correlation.correlationData && (
+                              <div className="mt-2 text-xs text-muted-foreground">
+                                {JSON.stringify(correlation.correlation.correlationData, null, 2).substring(0, 100)}...
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {correlationAnalysis.correlations.length > 5 && (
+                    <Button variant="outline" size="sm" className="w-full mt-3">
+                      View All {correlationAnalysis.correlations.length} Correlations
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-card p-4 rounded-lg border border-border text-center">
+                  <p className="text-sm text-muted-foreground">No correlations found for this alert.</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-card p-4 rounded-lg border border-border text-center">
+              <p className="text-sm text-muted-foreground">Click to analyze correlations</p>
+              <Button variant="outline" size="sm" className="mt-2">
+                Run Correlation Analysis
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Evidence Timeline */}
         <div>

@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAlertSchema, insertAuditLogSchema, insertIOCSchema } from "@shared/schema";
 import { threatIntelManager } from "./threat-feeds";
+import { correlationEngine } from "./correlation-engine";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -301,6 +302,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(metrics);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch metrics" });
+    }
+  });
+
+  // Correlation Engine routes
+  app.get("/api/correlations/:alertId", async (req, res) => {
+    try {
+      const analysis = await correlationEngine.analyzeAlert(req.params.alertId);
+      res.json(analysis);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("not found")) {
+        return res.status(404).json({ error: error.message });
+      }
+      res.status(500).json({ error: "Failed to analyze correlations" });
+    }
+  });
+
+  app.get("/api/correlations/:alertId/stored", async (req, res) => {
+    try {
+      const correlations = await storage.getCorrelations(req.params.alertId);
+      res.json(correlations);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch stored correlations" });
+    }
+  });
+
+  app.post("/api/correlations/batch-analyze", async (req, res) => {
+    try {
+      await correlationEngine.runBatchCorrelationAnalysis();
+      res.json({ success: true, message: "Batch correlation analysis completed" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to run batch correlation analysis" });
     }
   });
 

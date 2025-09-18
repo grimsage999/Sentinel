@@ -9,11 +9,14 @@ import {
   type InsertAuditLog,
   type User,
   type InsertUser,
+  type Correlation,
+  type InsertCorrelation,
   alerts,
   threatIntelligence,
   iocs,
   auditLog,
-  users
+  users,
+  correlations
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -44,6 +47,10 @@ export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+
+  // Correlation operations
+  getCorrelations(alertId: string): Promise<Correlation[]>;
+  createCorrelation(correlation: InsertCorrelation): Promise<Correlation>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -146,6 +153,19 @@ export class DatabaseStorage implements IStorage {
   async createUser(user: InsertUser): Promise<User> {
     const [newUser] = await db.insert(users).values(user).returning();
     return newUser;
+  }
+
+  async getCorrelations(alertId: string): Promise<Correlation[]> {
+    return await db
+      .select()
+      .from(correlations)
+      .where(eq(correlations.primaryAlertId, alertId))
+      .orderBy(desc(correlations.confidence));
+  }
+
+  async createCorrelation(correlation: InsertCorrelation): Promise<Correlation> {
+    const [newCorrelation] = await db.insert(correlations).values(correlation).returning();
+    return newCorrelation;
   }
 
   // Initialize with sample data for development

@@ -51,5 +51,11 @@ export const api = {
   async getMetrics(role: UserRole): Promise<DashboardMetrics> {
     const response = await apiRequest("GET", `/api/metrics/${role}`);
     return response.json();
+  },
+
+  // Correlation Analysis
+  async getCorrelationAnalysis(alertId: string): Promise<any> {
+    const response = await apiRequest("GET", `/api/correlations/${alertId}`);
+    return response.json();
   }
 };

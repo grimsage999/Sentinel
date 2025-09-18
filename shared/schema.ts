@@ -58,6 +58,16 @@ export const users = pgTable("users", {
   clearanceLevel: integer("clearance_level").default(1)
 });
 
+export const correlations = pgTable("correlations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  primaryAlertId: varchar("primary_alert_id").references(() => alerts.id).notNull(),
+  relatedAlertId: varchar("related_alert_id").references(() => alerts.id).notNull(),
+  correlationType: text("correlation_type").notNull(), // ioc_overlap, time_proximity, source_similarity, threat_actor, campaign
+  confidence: integer("confidence").notNull(), // 0-100 correlation confidence score
+  correlationData: jsonb("correlation_data"), // Specific details about the correlation
+  createdAt: timestamp("created_at").default(sql`now()`)
+});
+
 export const insertAlertSchema = createInsertSchema(alerts).omit({
   id: true,
   timestamp: true
@@ -82,6 +92,11 @@ export const insertUserSchema = createInsertSchema(users).omit({
   id: true
 });
 
+export const insertCorrelationSchema = createInsertSchema(correlations).omit({
+  id: true,
+  createdAt: true
+});
+
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
@@ -92,3 +107,5 @@ export type AuditLog = typeof auditLog.$inferSelect;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type Correlation = typeof correlations.$inferSelect;
+export type InsertCorrelation = z.infer<typeof insertCorrelationSchema>;
