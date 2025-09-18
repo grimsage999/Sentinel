@@ -1,0 +1,94 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(220, 13%, 4%);
+  --foreground: hsl(220, 9%, 96%);
+  --card: hsl(220, 13%, 8%);
+  --card-foreground: hsl(220, 9%, 96%);
+  --popover: hsl(220, 13%, 8%);
+  --popover-foreground: hsl(220, 9%, 96%);
+  --primary: hsl(195, 100%, 50%);
+  --primary-foreground: hsl(220, 13%, 4%);
+  --secondary: hsl(220, 13%, 14%);
+  --secondary-foreground: hsl(220, 9%, 96%);
+  --muted: hsl(220, 13%, 14%);
+  --muted-foreground: hsl(220, 9%, 64%);
+  --accent: hsl(195, 100%, 60%);
+  --accent-foreground: hsl(220, 13%, 4%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --border: hsl(220, 13%, 18%);
+  --input: hsl(220, 13%, 18%);
+  --ring: hsl(195, 100%, 50%);
+  --radius: 8px;
+  --chart-1: hsl(195, 100%, 50%);
+  --chart-2: hsl(280, 100%, 70%);
+  --chart-3: hsl(120, 100%, 50%);
+  --chart-4: hsl(45, 100%, 50%);
+  --chart-5: hsl(15, 100%, 60%);
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-mono: JetBrains Mono, Consolas, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .status-pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  .threat-glow {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  }
+  
+  .safe-glow {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+  }
+  
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+  
+  .scroll-area {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+  
+  .scroll-area::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scroll-area::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scroll-area::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+  
+  .scroll-area::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+}
