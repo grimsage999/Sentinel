@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertAlertSchema, insertAuditLogSchema, insertIOCSchema } from "@shared/schema";
+import { threatIntelManager } from "./threat-feeds";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -55,28 +56,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Threat Intelligence routes
   app.get("/api/threat-intelligence/:alertId", async (req, res) => {
     try {
-      const intel = await storage.getThreatIntelligence(req.params.alertId);
+      let intel = await storage.getThreatIntelligence(req.params.alertId);
+      
       if (!intel) {
-        // Create mock threat intelligence data
-        const mockIntel = await storage.createThreatIntelligence({
-          alertId: req.params.alertId,
-          maliciousScore: Math.floor(Math.random() * 100),
-          previousSightings: Math.floor(Math.random() * 50),
-          threatActor: ['APT28', 'Lazarus', 'FIN7', 'Unknown'][Math.floor(Math.random() * 4)],
-          iocs: [
-            { type: 'IP', value: '192.168.1.' + Math.floor(Math.random() * 255), reputation: 'Malicious' },
-            { type: 'Domain', value: 'suspicious-domain.com', reputation: 'Suspicious' },
-            { type: 'Hash', value: 'a1b2c3d4e5f6...', reputation: 'Clean' }
-          ],
-          attribution: {
-            confidence: 'High',
-            campaign: 'WellMail'
+        // Get alert to extract IOCs for enrichment
+        const alert = await storage.getAlert(req.params.alertId);
+        if (!alert) {
+          return res.status(404).json({ error: "Alert not found" });
+        }
+
+        // Extract IOCs from alert description for real-time enrichment
+        const iocExtractPatterns = {
+          ip: /\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b/g,
+          domain: /\b(?:[a-zA-Z0-9](?:[a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}\b/g,
+          url: /https?:\/\/[^\s<>"{}|\\^`\[\]]+/g,
+          hash: /\b[a-fA-F0-9]{32,64}\b/g
+        };
+
+        const extractedIOCs: string[] = [];
+        const text = `${alert.title} ${alert.description || ''}`;
+        
+        Object.values(iocExtractPatterns).forEach(pattern => {
+          const matches = text.match(pattern);
+          if (matches) {
+            extractedIOCs.push(...matches);
           }
         });
-        return res.json(mockIntel);
+
+        // Add some sample IOCs for demonstration if none found
+        if (extractedIOCs.length === 0) {
+          extractedIOCs.push(
+            '45.77.156.22',
+            'suspicious-domain.com',
+            'a1b2c3d4e5f6789012345678901234567890abcdefghijklmnopqrstuvwxyz1234'
+          );
+        }
+
+        // Generate real-time threat intelligence
+        const intelData = await threatIntelManager.aggregateThreatIntelligence(
+          req.params.alertId,
+          extractedIOCs
+        );
+
+        // Save the enriched data to database
+        intel = await storage.createThreatIntelligence(intelData);
       }
+
       res.json(intel);
     } catch (error) {
+      console.error('Threat intelligence error:', error);
       res.status(500).json({ error: "Failed to fetch threat intelligence" });
     }
   });
@@ -146,51 +174,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "IOC type and value required" });
       }
 
-      let enrichmentData = {};
-
-      // Mock enrichment based on IOC type
-      if (iocType === 'ip') {
-        enrichmentData = {
-          source: 'AbuseIPDB',
-          reputation: iocValue.startsWith('192.168') || iocValue.startsWith('10.') ? 'Clean' : 'Suspicious',
-          abuseConfidence: iocValue.startsWith('192.168') ? 0 : 75,
-          country: 'US',
-          usageType: iocValue.startsWith('192.168') ? 'Corporate' : 'Data Center'
-        };
-      } else if (iocType === 'domain') {
-        enrichmentData = {
-          source: 'VirusTotal',
-          reputation: iocValue.includes('suspicious') || iocValue.includes('phish') ? 'Malicious' : 'Clean',
-          detectionRatio: iocValue.includes('suspicious') ? '5/89' : '0/89',
-          categories: iocValue.includes('phish') ? ['phishing'] : ['legitimate'],
-          creationDate: '2023-01-15'
-        };
-      } else if (iocType === 'url') {
-        enrichmentData = {
-          source: 'URLScan.io',
-          reputation: iocValue.includes('malicious') || iocValue.includes('phish') ? 'Malicious' : 'Clean',
-          screenshotUrl: 'https://urlscan.io/screenshots/example.png',
-          redirects: iocValue.includes('redirect') ? 2 : 0,
-          technologies: iocValue.includes('php') ? ['Apache', 'PHP'] : ['nginx', 'JavaScript']
-        };
-      } else if (iocType === 'hash') {
-        enrichmentData = {
-          source: 'VirusTotal',
-          reputation: iocValue.length === 32 ? 'Malicious' : 'Clean',
-          detectionRatio: iocValue.length === 32 ? '45/70' : '0/70',
-          fileType: iocValue.length === 32 ? 'PE32 executable' : 'Unknown',
-          firstSeen: '2023-12-01'
-        };
-      }
+      // Use real-time threat intelligence enrichment
+      const enrichmentData = await threatIntelManager.enrichIOC(iocValue, iocType);
+      
+      // Return aggregated enrichment data from multiple sources
+      const aggregatedData = enrichmentData.length > 0 ? {
+        source: enrichmentData.map(d => d.sources).flat().join(', '),
+        reputation: enrichmentData[0].reputation,
+        maliciousScore: Math.round(enrichmentData.reduce((sum, d) => sum + d.maliciousScore, 0) / enrichmentData.length),
+        confidence: Math.round(enrichmentData.reduce((sum, d) => sum + d.confidence, 0) / enrichmentData.length),
+        threatActor: enrichmentData.find(d => d.threatActor)?.threatActor || 'Unknown',
+        campaign: enrichmentData.find(d => d.campaign)?.campaign || 'Unknown',
+        tags: [...new Set(enrichmentData.flatMap(d => d.tags))],
+        sources: [...new Set(enrichmentData.flatMap(d => d.sources))],
+        firstSeen: new Date(Math.min(...enrichmentData.map(d => d.firstSeen.getTime()))).toISOString(),
+        lastSeen: new Date(Math.max(...enrichmentData.map(d => d.lastSeen.getTime()))).toISOString()
+      } : {
+        source: 'No data available',
+        reputation: 'Unknown',
+        maliciousScore: 0,
+        confidence: 0,
+        threatActor: 'Unknown',
+        campaign: 'Unknown',
+        tags: [],
+        sources: [],
+        firstSeen: new Date().toISOString(),
+        lastSeen: new Date().toISOString()
+      };
 
       res.json({
         success: true,
         iocType,
         iocValue,
-        enrichment: enrichmentData
+        enrichment: aggregatedData
       });
     } catch (error) {
+      console.error('IOC enrichment error:', error);
       res.status(500).json({ error: "Failed to enrich IOC" });
+    }
+  });
+
+  // Threat feed management routes
+  app.get("/api/threat-feeds/status", async (req, res) => {
+    try {
+      const feedStatus = threatIntelManager.getFeedStatus();
+      res.json({
+        success: true,
+        feeds: feedStatus,
+        totalFeeds: feedStatus.length,
+        activeFeeds: feedStatus.filter(f => f.enabled).length
+      });
+    } catch (error) {
+      console.error('Feed status error:', error);
+      res.status(500).json({ error: "Failed to get threat feed status" });
     }
   });
 

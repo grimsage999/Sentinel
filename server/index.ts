@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
+import { threatIntelManager } from "./threat-feeds";
 
 const app = express();
 app.use(express.json());
@@ -50,6 +51,14 @@ app.use((req, res, next) => {
     } catch (error) {
       log("Error initializing sample data:", error);
     }
+  }
+
+  // Start real-time threat intelligence feeds
+  try {
+    await threatIntelManager.startLiveFeedUpdates();
+    log("Real-time threat intelligence feeds started");
+  } catch (error) {
+    log("Error starting threat intelligence feeds:", error);
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
