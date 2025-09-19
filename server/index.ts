@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { threatIntelManager } from "./threat-feeds";
+import { siemIntegration } from "./siem-integration";
 import { playbookEngine } from "./playbook-engine";
 
 const app = express();
@@ -64,6 +65,14 @@ app.use((req, res, next) => {
     log("Real-time threat intelligence feeds started");
   } catch (error) {
     log("Error starting threat intelligence feeds:", error);
+  }
+
+  // Initialize SIEM platform integrations
+  try {
+    await siemIntegration.connectToAllPlatforms();
+    log("SIEM platform integrations started");
+  } catch (error) {
+    log("Error starting SIEM integrations:", error);
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

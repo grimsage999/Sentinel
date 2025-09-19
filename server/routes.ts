@@ -6,6 +6,7 @@ import { threatIntelManager } from "./threat-feeds";
 import { correlationEngine } from "./correlation-engine";
 import { playbookEngine } from "./playbook-engine";
 import { emailService } from "./email-service";
+import { siemIntegration } from "./siem-integration";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -569,6 +570,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to send alert notification" });
+    }
+  });
+
+  // SIEM Integration routes
+  app.get("/api/siem/status", async (req, res) => {
+    try {
+      const connectedPlatforms = siemIntegration.getConnectedPlatforms();
+      const statistics = siemIntegration.getStatistics();
+      
+      res.json({
+        connectedPlatforms,
+        statistics,
+        totalPlatforms: connectedPlatforms.length,
+        connectedCount: connectedPlatforms.filter(p => p.connected).length
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get SIEM status" });
+    }
+  });
+
+  app.post("/api/siem/connect/:platform", async (req, res) => {
+    try {
+      const platform = req.params.platform;
+      const success = await siemIntegration.connectToPlatform(platform as any);
+      
+      res.json({
+        success,
+        message: success ? `Connected to ${platform}` : `Failed to connect to ${platform}`,
+        platform
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to connect to SIEM platform" });
+    }
+  });
+
+  app.post("/api/siem/disconnect/:platform", async (req, res) => {
+    try {
+      const platform = req.params.platform;
+      await siemIntegration.disconnectFromPlatform(platform as any);
+      
+      res.json({
+        success: true,
+        message: `Disconnected from ${platform}`,
+        platform
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to disconnect from SIEM platform" });
+    }
+  });
+
+  app.get("/api/siem/test-connections", async (req, res) => {
+    try {
+      const results = await siemIntegration.testAllConnections();
+      res.json({ results });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to test SIEM connections" });
+    }
+  });
+
+  app.post("/api/siem/fetch-events/:platform", async (req, res) => {
+    try {
+      const platform = req.params.platform;
+      const { limit = 50 } = req.body;
+      
+      const events = await siemIntegration.fetchHistoricalEvents(platform as any, undefined, limit);
+      
+      res.json({
+        success: true,
+        events,
+        count: events.length,
+        platform
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch SIEM events" });
     }
   });
 
