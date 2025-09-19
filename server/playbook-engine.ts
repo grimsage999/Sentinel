@@ -1,4 +1,5 @@
 import { storage } from "./storage";
+import { emailService } from "./email-service";
 import { type Alert, type Playbook, type PlaybookAction, type PlaybookExecution } from "@shared/schema";
 
 // Action Types for Automated Incident Response
@@ -154,32 +155,74 @@ export class PlaybookEngine {
   }
 
   private async executeSendNotification(action: PlaybookAction, config: ActionConfig["send_notification"], alert: Alert): Promise<ActionResult> {
-    // Simulate sending notification - in real implementation, this would integrate with email/SMS services
-    console.log(`[PLAYBOOK] Sending ${config!.severity} notification for alert ${alert.id} to:`, config!.recipients);
-    
-    return {
-      actionId: action.id,
-      actionType: "send_notification",
-      status: "success",
-      message: `Notification sent to ${config!.recipients.length} recipients`,
-      executedAt: new Date()
-    };
+    try {
+      console.log(`[PLAYBOOK] Sending ${config!.severity} notification for alert ${alert.id} to:`, config!.recipients);
+      
+      // Use the email service to send actual notifications
+      const emailSent = await emailService.sendCustomNotification(
+        config!.recipients,
+        `${config!.severity.toUpperCase()} Alert: ${alert.title}`,
+        config!.customMessage || `Security alert ${alert.id} detected and requires attention.\n\nAlert: ${alert.title}\nSeverity: ${alert.severity}\nSource: ${alert.source}\nDescription: ${alert.description}`,
+        config!.severity as any
+      );
+
+      if (emailSent) {
+        return {
+          actionId: action.id,
+          actionType: "send_notification",
+          status: "success",
+          message: `Email notification sent to ${config!.recipients.length} recipients`,
+          executedAt: new Date()
+        };
+      } else {
+        return {
+          actionId: action.id,
+          actionType: "send_notification",
+          status: "failed",
+          message: "Failed to send email notification",
+          executedAt: new Date(),
+          error: "Email service unavailable"
+        };
+      }
+    } catch (error) {
+      return {
+        actionId: action.id,
+        actionType: "send_notification",
+        status: "failed",
+        message: "Error sending notification",
+        executedAt: new Date(),
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
   }
 
   private async executeEscalate(action: PlaybookAction, config: ActionConfig["escalate"], alert: Alert): Promise<ActionResult> {
-    // Simulate escalation - in real implementation, this would update assignment and notify managers
-    console.log(`[PLAYBOOK] Escalating alert ${alert.id} to ${config!.to} at level ${config!.escalationLevel}`);
-    
-    // Update alert assignee
-    await storage.updateAlert(alert.id, { assignee: config!.to });
-    
-    return {
-      actionId: action.id,
-      actionType: "escalate",
-      status: "success",
-      message: `Alert escalated to ${config!.to} - ${config!.reason}`,
-      executedAt: new Date()
-    };
+    try {
+      console.log(`[PLAYBOOK] Escalating alert ${alert.id} to ${config!.to} at level ${config!.escalationLevel}`);
+      
+      // Update alert assignee
+      await storage.updateAlert(alert.id, { assignee: config!.to });
+      
+      // Send escalation email notification
+      const emailSent = await emailService.sendEscalationNotification(alert, config!.reason);
+      
+      return {
+        actionId: action.id,
+        actionType: "escalate",
+        status: "success",
+        message: `Alert escalated to ${config!.to} - ${config!.reason}${emailSent ? ' (Email sent)' : ' (Email failed)'}`,
+        executedAt: new Date()
+      };
+    } catch (error) {
+      return {
+        actionId: action.id,
+        actionType: "escalate",
+        status: "failed", 
+        message: "Failed to escalate alert",
+        executedAt: new Date(),
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
   }
 
   private async executeBlockIP(action: PlaybookAction, config: ActionConfig["block_ip"], alert: Alert): Promise<ActionResult> {

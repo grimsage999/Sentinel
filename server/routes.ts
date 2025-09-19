@@ -5,6 +5,7 @@ import { insertAlertSchema, insertAuditLogSchema, insertIOCSchema, insertPlayboo
 import { threatIntelManager } from "./threat-feeds";
 import { correlationEngine } from "./correlation-engine";
 import { playbookEngine } from "./playbook-engine";
+import { emailService } from "./email-service";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -461,6 +462,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(execution);
     } catch (error) {
       res.status(500).json({ error: "Failed to execute playbook" });
+    }
+  });
+
+  // Email Notification routes
+  app.get("/api/email/config", async (req, res) => {
+    try {
+      const config = emailService.getConfig();
+      res.json({
+        ...config,
+        hasApiKey: emailService.hasApiKey(),
+        enabled: emailService.isEnabled()
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get email configuration" });
+    }
+  });
+
+  app.patch("/api/email/config", async (req, res) => {
+    try {
+      const updateSchema = z.object({
+        enabled: z.boolean().optional(),
+        fromEmail: z.string().email().optional(),
+        defaultRecipients: z.array(z.string().email()).optional(),
+        escalationRecipients: z.array(z.string().email()).optional(),
+        criticalRecipients: z.array(z.string().email()).optional()
+      });
+
+      const updates = updateSchema.parse(req.body);
+      emailService.updateConfig(updates);
+      
+      res.json({
+        success: true,
+        config: emailService.getConfig()
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to update email configuration" });
+    }
+  });
+
+  // Send test email
+  app.post("/api/email/test", async (req, res) => {
+    try {
+      const testSchema = z.object({
+        to: z.array(z.string().email()),
+        subject: z.string().min(1),
+        message: z.string().min(1)
+      });
+
+      const { to, subject, message } = testSchema.parse(req.body);
+      
+      const success = await emailService.sendCustomNotification(
+        to,
+        `TEST: ${subject}`,
+        `This is a test email from Cyber-Sentinel Workbench.\n\n${message}`,
+        "normal"
+      );
+
+      res.json({
+        success,
+        message: success ? "Test email sent successfully" : "Failed to send test email",
+        simulationMode: !emailService.hasApiKey()
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to send test email" });
+    }
+  });
+
+  // Send alert notification manually
+  app.post("/api/email/alert-notification", async (req, res) => {
+    try {
+      const { alertId, type } = req.body;
+      if (!alertId) {
+        return res.status(400).json({ error: "alertId is required" });
+      }
+
+      const alert = await storage.getAlert(alertId);
+      if (!alert) {
+        return res.status(404).json({ error: "Alert not found" });
+      }
+
+      let success = false;
+      
+      switch (type) {
+        case "new":
+          success = await emailService.sendNewAlertNotification(alert);
+          break;
+        case "escalated":
+          const reason = req.body.reason || "Manual escalation";
+          success = await emailService.sendEscalationNotification(alert, reason);
+          break;
+        default:
+          return res.status(400).json({ error: "Invalid notification type. Use 'new' or 'escalated'" });
+      }
+
+      res.json({
+        success,
+        message: success ? `${type} alert notification sent` : "Failed to send notification",
+        simulationMode: !emailService.hasApiKey()
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to send alert notification" });
     }
   });
 
