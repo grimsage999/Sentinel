@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { storage } from "./storage";
 import { threatIntelManager } from "./threat-feeds";
+import { playbookEngine } from "./playbook-engine";
 
 const app = express();
 app.use(express.json());
@@ -48,6 +49,10 @@ app.use((req, res, next) => {
     try {
       await (storage as any).initializeSampleData?.();
       log("Sample data initialized");
+      
+      // Initialize sample playbooks
+      await playbookEngine.initializeSamplePlaybooks();
+      log("Sample playbooks initialized");
     } catch (error) {
       log("Error initializing sample data:", error);
     }

@@ -68,6 +68,41 @@ export const correlations = pgTable("correlations", {
   createdAt: timestamp("created_at").default(sql`now()`)
 });
 
+export const playbooks = pgTable("playbooks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  description: text("description"),
+  triggerConditions: jsonb("trigger_conditions").notNull(), // Conditions that trigger this playbook
+  enabled: boolean("enabled").default(true),
+  severity: text("severity"), // Critical, High, Medium, Low - what alert severities trigger this
+  alertTypes: jsonb("alert_types"), // Array of alert types that trigger this playbook
+  createdBy: text("created_by").notNull(),
+  createdAt: timestamp("created_at").default(sql`now()`),
+  updatedAt: timestamp("updated_at").default(sql`now()`)
+});
+
+export const playbookActions = pgTable("playbook_actions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  playbookId: varchar("playbook_id").references(() => playbooks.id).notNull(),
+  actionType: text("action_type").notNull(), // isolate_host, send_notification, escalate, block_ip, quarantine_file, create_ticket
+  actionOrder: integer("action_order").notNull(), // Execution order within playbook
+  actionConfig: jsonb("action_config").notNull(), // Configuration for this specific action
+  isAutomated: boolean("is_automated").default(true), // Whether this action requires manual approval
+  createdAt: timestamp("created_at").default(sql`now()`)
+});
+
+export const playbookExecutions = pgTable("playbook_executions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  playbookId: varchar("playbook_id").references(() => playbooks.id).notNull(),
+  alertId: varchar("alert_id").references(() => alerts.id).notNull(),
+  status: text("status").notNull().default("Running"), // Running, Completed, Failed, Pending_Approval
+  startedAt: timestamp("started_at").default(sql`now()`),
+  completedAt: timestamp("completed_at"),
+  executionResults: jsonb("execution_results"), // Results of each action execution
+  triggeredBy: text("triggered_by").notNull(), // AUTO, MANUAL, USER:username
+  errorMessage: text("error_message")
+});
+
 export const insertAlertSchema = createInsertSchema(alerts).omit({
   id: true,
   timestamp: true
@@ -97,6 +132,22 @@ export const insertCorrelationSchema = createInsertSchema(correlations).omit({
   createdAt: true
 });
 
+export const insertPlaybookSchema = createInsertSchema(playbooks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true
+});
+
+export const insertPlaybookActionSchema = createInsertSchema(playbookActions).omit({
+  id: true,
+  createdAt: true
+});
+
+export const insertPlaybookExecutionSchema = createInsertSchema(playbookExecutions).omit({
+  id: true,
+  startedAt: true
+});
+
 export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = z.infer<typeof insertAlertSchema>;
 export type ThreatIntelligence = typeof threatIntelligence.$inferSelect;
@@ -109,3 +160,9 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Correlation = typeof correlations.$inferSelect;
 export type InsertCorrelation = z.infer<typeof insertCorrelationSchema>;
+export type Playbook = typeof playbooks.$inferSelect;
+export type InsertPlaybook = z.infer<typeof insertPlaybookSchema>;
+export type PlaybookAction = typeof playbookActions.$inferSelect;
+export type InsertPlaybookAction = z.infer<typeof insertPlaybookActionSchema>;
+export type PlaybookExecution = typeof playbookExecutions.$inferSelect;
+export type InsertPlaybookExecution = z.infer<typeof insertPlaybookExecutionSchema>;

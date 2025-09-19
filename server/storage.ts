@@ -11,12 +11,21 @@ import {
   type InsertUser,
   type Correlation,
   type InsertCorrelation,
+  type Playbook,
+  type InsertPlaybook,
+  type PlaybookAction,
+  type InsertPlaybookAction,
+  type PlaybookExecution,
+  type InsertPlaybookExecution,
   alerts,
   threatIntelligence,
   iocs,
   auditLog,
   users,
-  correlations
+  correlations,
+  playbooks,
+  playbookActions,
+  playbookExecutions
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -51,6 +60,23 @@ export interface IStorage {
   // Correlation operations
   getCorrelations(alertId: string): Promise<Correlation[]>;
   createCorrelation(correlation: InsertCorrelation): Promise<Correlation>;
+
+  // Playbook operations
+  getPlaybooks(): Promise<Playbook[]>;
+  getPlaybook(id: string): Promise<Playbook | undefined>;
+  createPlaybook(playbook: InsertPlaybook): Promise<Playbook>;
+  updatePlaybook(id: string, playbook: Partial<Playbook>): Promise<Playbook | undefined>;
+  deletePlaybook(id: string): Promise<boolean>;
+
+  // Playbook Action operations
+  getPlaybookActions(playbookId: string): Promise<PlaybookAction[]>;
+  createPlaybookAction(action: InsertPlaybookAction): Promise<PlaybookAction>;
+  deletePlaybookAction(id: string): Promise<boolean>;
+
+  // Playbook Execution operations
+  getPlaybookExecutions(alertId?: string): Promise<PlaybookExecution[]>;
+  createPlaybookExecution(execution: InsertPlaybookExecution): Promise<PlaybookExecution>;
+  updatePlaybookExecution(id: string, execution: Partial<PlaybookExecution>): Promise<PlaybookExecution | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -166,6 +192,78 @@ export class DatabaseStorage implements IStorage {
   async createCorrelation(correlation: InsertCorrelation): Promise<Correlation> {
     const [newCorrelation] = await db.insert(correlations).values(correlation).returning();
     return newCorrelation;
+  }
+
+  // Playbook operations
+  async getPlaybooks(): Promise<Playbook[]> {
+    return await db.select().from(playbooks).orderBy(desc(playbooks.createdAt));
+  }
+
+  async getPlaybook(id: string): Promise<Playbook | undefined> {
+    const [playbook] = await db.select().from(playbooks).where(eq(playbooks.id, id));
+    return playbook || undefined;
+  }
+
+  async createPlaybook(playbook: InsertPlaybook): Promise<Playbook> {
+    const [newPlaybook] = await db.insert(playbooks).values(playbook).returning();
+    return newPlaybook;
+  }
+
+  async updatePlaybook(id: string, playbookUpdate: Partial<Playbook>): Promise<Playbook | undefined> {
+    const [updated] = await db.update(playbooks)
+      .set({ ...playbookUpdate, updatedAt: sql`now()` })
+      .where(eq(playbooks.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deletePlaybook(id: string): Promise<boolean> {
+    const result = await db.delete(playbooks).where(eq(playbooks.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Playbook Action operations
+  async getPlaybookActions(playbookId: string): Promise<PlaybookAction[]> {
+    return await db
+      .select()
+      .from(playbookActions)
+      .where(eq(playbookActions.playbookId, playbookId))
+      .orderBy(playbookActions.actionOrder);
+  }
+
+  async createPlaybookAction(action: InsertPlaybookAction): Promise<PlaybookAction> {
+    const [newAction] = await db.insert(playbookActions).values(action).returning();
+    return newAction;
+  }
+
+  async deletePlaybookAction(id: string): Promise<boolean> {
+    const result = await db.delete(playbookActions).where(eq(playbookActions.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Playbook Execution operations
+  async getPlaybookExecutions(alertId?: string): Promise<PlaybookExecution[]> {
+    if (alertId) {
+      return await db
+        .select()
+        .from(playbookExecutions)
+        .where(eq(playbookExecutions.alertId, alertId))
+        .orderBy(desc(playbookExecutions.startedAt));
+    }
+    return await db.select().from(playbookExecutions).orderBy(desc(playbookExecutions.startedAt));
+  }
+
+  async createPlaybookExecution(execution: InsertPlaybookExecution): Promise<PlaybookExecution> {
+    const [newExecution] = await db.insert(playbookExecutions).values(execution).returning();
+    return newExecution;
+  }
+
+  async updatePlaybookExecution(id: string, execution: Partial<PlaybookExecution>): Promise<PlaybookExecution | undefined> {
+    const [updated] = await db.update(playbookExecutions)
+      .set(execution)
+      .where(eq(playbookExecutions.id, id))
+      .returning();
+    return updated || undefined;
   }
 
   // Initialize with sample data for development

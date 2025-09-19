@@ -1,9 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertAlertSchema, insertAuditLogSchema, insertIOCSchema } from "@shared/schema";
+import { insertAlertSchema, insertAuditLogSchema, insertIOCSchema, insertPlaybookSchema, insertPlaybookActionSchema } from "@shared/schema";
 import { threatIntelManager } from "./threat-feeds";
 import { correlationEngine } from "./correlation-engine";
+import { playbookEngine } from "./playbook-engine";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -33,6 +34,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const alertData = insertAlertSchema.parse(req.body);
       const alert = await storage.createAlert(alertData);
+      
+      // Trigger automated playbook evaluation for new alert
+      playbookEngine.evaluateTriggersForAlert(alert).catch(error => {
+        console.error("Failed to evaluate playbook triggers:", error);
+      });
+      
       res.status(201).json(alert);
     } catch (error) {
       if (error instanceof z.ZodError) {
@@ -333,6 +340,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ success: true, message: "Batch correlation analysis completed" });
     } catch (error) {
       res.status(500).json({ error: "Failed to run batch correlation analysis" });
+    }
+  });
+
+  // Playbook routes
+  app.get("/api/playbooks", async (req, res) => {
+    try {
+      const playbooks = await storage.getPlaybooks();
+      res.json(playbooks);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch playbooks" });
+    }
+  });
+
+  app.get("/api/playbooks/:id", async (req, res) => {
+    try {
+      const playbook = await storage.getPlaybook(req.params.id);
+      if (!playbook) {
+        return res.status(404).json({ error: "Playbook not found" });
+      }
+      res.json(playbook);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch playbook" });
+    }
+  });
+
+  app.post("/api/playbooks", async (req, res) => {
+    try {
+      const playbookData = insertPlaybookSchema.parse(req.body);
+      const playbook = await storage.createPlaybook(playbookData);
+      res.status(201).json(playbook);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create playbook" });
+    }
+  });
+
+  app.patch("/api/playbooks/:id", async (req, res) => {
+    try {
+      const playbook = await storage.updatePlaybook(req.params.id, req.body);
+      if (!playbook) {
+        return res.status(404).json({ error: "Playbook not found" });
+      }
+      res.json(playbook);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update playbook" });
+    }
+  });
+
+  app.delete("/api/playbooks/:id", async (req, res) => {
+    try {
+      const success = await storage.deletePlaybook(req.params.id);
+      if (!success) {
+        return res.status(404).json({ error: "Playbook not found" });
+      }
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete playbook" });
+    }
+  });
+
+  // Playbook Actions routes
+  app.get("/api/playbooks/:id/actions", async (req, res) => {
+    try {
+      const actions = await storage.getPlaybookActions(req.params.id);
+      res.json(actions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch playbook actions" });
+    }
+  });
+
+  app.post("/api/playbooks/:id/actions", async (req, res) => {
+    try {
+      const actionData = insertPlaybookActionSchema.parse({
+        ...req.body,
+        playbookId: req.params.id
+      });
+      const action = await storage.createPlaybookAction(actionData);
+      res.status(201).json(action);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      res.status(500).json({ error: "Failed to create playbook action" });
+    }
+  });
+
+  // Playbook Executions routes
+  app.get("/api/playbook-executions", async (req, res) => {
+    try {
+      const alertId = req.query.alertId as string;
+      const executions = await storage.getPlaybookExecutions(alertId);
+      res.json(executions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch playbook executions" });
+    }
+  });
+
+  // Manual playbook execution
+  app.post("/api/playbooks/:id/execute", async (req, res) => {
+    try {
+      const { alertId } = req.body;
+      if (!alertId) {
+        return res.status(400).json({ error: "alertId is required" });
+      }
+
+      const playbook = await storage.getPlaybook(req.params.id);
+      if (!playbook) {
+        return res.status(404).json({ error: "Playbook not found" });
+      }
+
+      const alert = await storage.getAlert(alertId);
+      if (!alert) {
+        return res.status(404).json({ error: "Alert not found" });
+      }
+
+      const execution = await playbookEngine.executePlaybook(playbook, alert, "MANUAL");
+      res.status(201).json(execution);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to execute playbook" });
     }
   });
 
