@@ -4,6 +4,7 @@
 import { spawn } from "child_process";
 import { randomUUID } from "crypto";
 import path from "path";
+import { mitreAttackService, type EnrichedMitreTechnique } from "./mitre-attack";
 
 export interface EmailAnalysisRequest {
   emailContent: string;
@@ -64,9 +65,97 @@ export interface EmailAnalysisResult {
 
 class EmailAnalysisService {
   private pythonBackendUrl = process.env.PYTHON_BACKEND_URL || "http://localhost:8000";
+  private pythonProcess: any = null;
+  private isStarting = false;
+  private isReady = false;
+  
+  constructor() {
+    this.checkPythonBackend().catch(console.error);
+  }
+
+  private async checkPythonBackend() {
+    try {
+      // Check if Python backend is already running
+      const response = await fetch(`${this.pythonBackendUrl}/api/health`);
+      if (response.ok) {
+        console.log("✅ Python email analysis backend is already running");
+        this.isReady = true;
+        return;
+      }
+    } catch (error) {
+      // Python backend not running, try to start it
+      console.log("🐍 Python backend not found, starting...");
+      this.startPythonBackend();
+    }
+  }
+
+  private async startPythonBackend() {
+    if (this.isStarting || this.pythonProcess) return;
+    this.isStarting = true;
+
+    try {
+      const pythonBackendPath = path.join(process.cwd(), "backend 20-15-57-708");
+      
+      console.log("🐍 Starting integrated Python email analysis backend...");
+      
+      // Start Python backend as a child process
+      this.pythonProcess = spawn("bash", ["-c", `cd "${pythonBackendPath}" && source venv/bin/activate && uvicorn app.main:app --host 127.0.0.1 --port 8000 --log-level warning`], {
+        stdio: ["ignore", "pipe", "pipe"],
+        detached: false
+      });
+
+      this.pythonProcess.stdout.on("data", (data: Buffer) => {
+        const output = data.toString().trim();
+        if (output.includes("Uvicorn running")) {
+          this.isReady = true;
+          console.log("✅ Python email analysis backend is ready");
+        }
+      });
+
+      this.pythonProcess.stderr.on("data", (data: Buffer) => {
+        const error = data.toString().trim();
+        if (!error.includes("WARNING")) {
+          console.log(`[Python Backend] ${error}`);
+        }
+      });
+
+      this.pythonProcess.on("exit", (code: number) => {
+        console.log(`Python backend exited with code ${code}`);
+        this.pythonProcess = null;
+        this.isReady = false;
+        this.isStarting = false;
+      });
+
+      // Wait for Python backend to start
+      await new Promise(resolve => {
+        const checkReady = () => {
+          if (this.isReady) {
+            resolve(true);
+          } else {
+            setTimeout(checkReady, 500);
+          }
+        };
+        checkReady();
+      });
+      
+    } catch (error) {
+      console.log("❌ Failed to start Python backend:", error.message);
+      this.isStarting = false;
+    }
+  }
   
   async analyzeEmail(request: EmailAnalysisRequest): Promise<EmailAnalysisResult> {
+    // Ensure Python backend is ready
+    if (!this.isReady) {
+      await this.checkPythonBackend();
+      if (!this.isReady) {
+        throw new Error("Python backend is not available");
+      }
+    }
+
     try {
+      console.log(`🔍 Analyzing email via Python backend: ${this.pythonBackendUrl}/api/analyze`);
+      
       // Call the Python backend for analysis
       const response = await fetch(`${this.pythonBackendUrl}/api/analyze`, {
         method: 'POST',
@@ -80,22 +169,190 @@ class EmailAnalysisService {
       });
 
       if (!response.ok) {
-        throw new Error(`Python backend error: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        throw new Error(`Python backend error: ${response.status} ${response.statusText} - ${errorText}`);
       }
 
       const result = await response.json();
+      console.log(`✅ Python backend analysis completed for email`);
       
-      return {
-        id: randomUUID(),
-        timestamp: new Date().toISOString(),
-        email_content: request.emailContent,
-        analysis: result.analysis
-      };
+      // Handle the Python backend response structure
+      if (result.success && result.data) {
+        const pythonData = result.data;
+        return {
+          id: randomUUID(),
+          timestamp: new Date().toISOString(),
+          email_content: request.emailContent,
+          analysis: {
+            intent: {
+              primary_intent: pythonData.intent?.primary || "unknown",
+              confidence: pythonData.intent?.confidence === "Medium" ? 0.7 : pythonData.intent?.confidence === "High" ? 0.9 : 0.5,
+              secondary_intents: pythonData.intent?.alternatives || [],
+              reasoning: pythonData.riskScore?.reasoning || "Analysis completed by Python backend"
+            },
+            risk_score: {
+              overall_score: pythonData.riskScore?.score || 0,
+              risk_level: pythonData.riskScore?.score >= 8 ? "High" : pythonData.riskScore?.score >= 5 ? "Medium" : "Low",
+              factors: pythonData.deceptionIndicators?.map((indicator: any) => ({
+                factor: indicator.type,
+                impact: indicator.severity === "High" ? 30 : indicator.severity === "Medium" ? 20 : 10,
+                description: indicator.description
+              })) || []
+            },
+            deception_indicators: pythonData.deceptionIndicators?.map((indicator: any) => ({
+              type: indicator.type,
+              severity: indicator.severity?.toLowerCase() || "medium",
+              description: indicator.description,
+              evidence: indicator.evidence
+            })) || [],
+            mitre_attack: await this.enrichMitreData(pythonData.mitreAttack),
+            iocs: {
+              urls: pythonData.iocs?.urls?.map((ioc: any) => {
+                if (typeof ioc === 'string') {
+                  return { value: ioc, vtLink: null };
+                }
+                return {
+                  value: ioc.value || ioc,
+                  vtLink: ioc.vtLink || null,
+                  type: ioc.type || 'url',
+                  context: ioc.context || null
+                };
+              }) || [],
+              domains: pythonData.iocs?.domains?.map((ioc: any) => 
+                typeof ioc === 'string' ? ioc : ioc.value || ioc
+              ) || [],
+              ips: pythonData.iocs?.ips?.map((ioc: any) => 
+                typeof ioc === 'string' ? ioc : ioc.value || ioc
+              ) || [],
+              emails: pythonData.iocs?.emails?.map((ioc: any) => 
+                typeof ioc === 'string' ? ioc : ioc.value || ioc
+              ) || [],
+              hashes: pythonData.iocs?.hashes?.map((ioc: any) => 
+                typeof ioc === 'string' ? ioc : ioc.value || ioc
+              ) || []
+            }
+          }
+        };
+      }
+      
+      throw new Error("Invalid response structure from Python backend");
     } catch (error) {
-      console.error("Email analysis failed:", error);
-      
-      // Return a fallback analysis
-      return this.getFallbackAnalysis(request.emailContent);
+      console.error("❌ Email analysis failed:", error);
+      throw error; // Re-throw the error instead of using fallback
+    }
+  }
+
+  /**
+   * Enrich MITRE ATT&CK data with official framework information
+   */
+  private async enrichMitreData(mitreData: any): Promise<any> {
+    if (!mitreData || (!mitreData.techniques && !mitreData.tactics)) {
+      return {
+        techniques: [],
+        tactics: []
+      };
+    }
+
+    try {
+      // Enrich techniques with official MITRE data
+      const enrichedTechniques = [];
+      if (mitreData.techniques && Array.isArray(mitreData.techniques)) {
+        for (const techniqueId of mitreData.techniques) {
+          const officialTechnique = await mitreAttackService.getTechnique(techniqueId);
+          if (officialTechnique) {
+            enrichedTechniques.push({
+              id: officialTechnique.id,
+              name: officialTechnique.name,
+              confidence: officialTechnique.confidence,
+              description: officialTechnique.description,
+              url: officialTechnique.url,
+              platforms: officialTechnique.platforms,
+              tactics: officialTechnique.tactics,
+              data_sources: officialTechnique.data_sources,
+              detection: officialTechnique.detection,
+              sub_techniques: officialTechnique.sub_techniques
+            });
+          } else {
+            // Fallback for unknown techniques
+            enrichedTechniques.push({
+              id: techniqueId,
+              name: `MITRE ${techniqueId}`,
+              confidence: 0.6,
+              description: `MITRE ATT&CK technique ${techniqueId}`,
+              url: `https://attack.mitre.org/techniques/${techniqueId}`,
+              platforms: [],
+              tactics: [],
+              data_sources: [],
+              detection: '',
+              sub_techniques: []
+            });
+          }
+        }
+      }
+
+      // Enrich tactics with official MITRE data
+      const enrichedTactics = [];
+      if (mitreData.tactics && Array.isArray(mitreData.tactics)) {
+        for (const tacticName of mitreData.tactics) {
+          // Try to find tactic by name since Python backend returns tactic names
+          const allTactics = await mitreAttackService.getAllTactics();
+          const officialTactic = allTactics.find(t => 
+            t.shortname.toLowerCase() === tacticName.toLowerCase() ||
+            t.name.toLowerCase().includes(tacticName.toLowerCase())
+          );
+
+          if (officialTactic) {
+            enrichedTactics.push({
+              id: officialTactic.id,
+              name: officialTactic.name,
+              description: officialTactic.description,
+              shortname: officialTactic.shortname,
+              url: officialTactic.url
+            });
+          } else {
+            // Fallback for unknown tactics
+            enrichedTactics.push({
+              id: tacticName,
+              name: tacticName.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+              description: `MITRE ATT&CK tactic: ${tacticName}`,
+              shortname: tacticName,
+              url: `https://attack.mitre.org/tactics/${tacticName}`
+            });
+          }
+        }
+      }
+
+      return {
+        techniques: enrichedTechniques,
+        tactics: enrichedTactics
+      };
+
+    } catch (error) {
+      console.error('❌ Failed to enrich MITRE data:', error);
+      // Return basic structure on error
+      return {
+        techniques: mitreData.techniques?.map((id: string) => ({
+          id,
+          name: `MITRE ${id}`,
+          confidence: 0.6,
+          description: `MITRE ATT&CK technique ${id}`
+        })) || [],
+        tactics: mitreData.tactics?.map((tactic: string) => ({
+          id: tactic,
+          name: tactic.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          description: `MITRE ATT&CK tactic: ${tactic}`
+        })) || []
+      };
+    }
+  }
+
+  // Cleanup method to properly shut down the Python backend
+  cleanup() {
+    if (this.pythonProcess) {
+      console.log("🛑 Shutting down Python email analysis backend...");
+      this.pythonProcess.kill('SIGTERM');
+      this.pythonProcess = null;
+      this.isReady = false;
     }
   }
 
@@ -163,4 +420,5 @@ class EmailAnalysisService {
   }
 }
 
+// Create and export a singleton instance
 export const emailAnalysisService = new EmailAnalysisService();

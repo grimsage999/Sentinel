@@ -83,7 +83,7 @@ export default function EmailAnalysis() {
       
       toast({
         title: "Analysis Complete",
-        description: `Email analyzed with ${result.analysis.risk_score.risk_level} risk level`,
+        description: `Email analyzed with ${result.analysis?.risk_score?.risk_level || "Unknown"} risk level`,
       });
     } catch (error) {
       toast({
@@ -207,7 +207,7 @@ Security Team`;
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {!analysisResult ? (
+              {!analysisResult || !analysisResult.analysis ? (
                 <div className="text-center text-muted-foreground py-12">
                   <Mail className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No analysis results yet. Analyze an email to see results.</p>
@@ -330,11 +330,30 @@ Security Team`;
                           <p className="text-sm text-muted-foreground">No {type} found.</p>
                         ) : (
                           <div className="space-y-1">
-                            {items.map((item: string, index: number) => (
-                              <div key={index} className="font-mono text-sm bg-muted p-2 rounded">
-                                {item}
-                              </div>
-                            ))}
+                            {items.map((item: any, index: number) => {
+                              // Handle both string and object IOCs
+                              const displayValue = typeof item === 'string' ? item : item?.value || JSON.stringify(item);
+                              const vtLink = item?.vtLink;
+                              
+                              return (
+                                <div key={index} className="font-mono text-sm bg-muted p-2 rounded break-all">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <span className="flex-1">{displayValue}</span>
+                                    {vtLink && (
+                                      <a 
+                                        href={vtLink} 
+                                        target="_blank" 
+                                        rel="noopener noreferrer"
+                                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded flex-shrink-0"
+                                        title="View VirusTotal analysis"
+                                      >
+                                        VT Analysis
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         )}
                       </div>

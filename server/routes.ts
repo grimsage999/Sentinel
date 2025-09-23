@@ -8,6 +8,7 @@ import { playbookEngine } from "./playbook-engine";
 import { emailService } from "./email-service";
 import { siemIntegration } from "./siem-integration";
 import { emailAnalysisService } from "./email-analysis";
+import { mitreAttackService } from "./mitre-attack";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -658,10 +659,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email_content, headers } = emailAnalysisSchema.parse(req.body);
       
+      console.log(`📧 Received email analysis request for ${email_content.length} characters`);
+      
       const result = await emailAnalysisService.analyzeEmail({
         emailContent: email_content,
         headers
       });
+
+      console.log(`✅ Email analysis completed with risk level: ${result.analysis?.risk_score?.risk_level}`);
 
       // Create an audit log entry for the analysis
       await storage.createAuditLog({
@@ -669,8 +674,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: "Email analysis performed",
         metadata: { 
           analysisId: result.id,
-          riskLevel: result.analysis.risk_score.risk_level,
-          primaryIntent: result.analysis.intent.primary_intent
+          riskLevel: result.analysis?.risk_score?.risk_level || "Unknown",
+          primaryIntent: result.analysis?.intent?.primary_intent || "Unknown"
         }
       });
 
@@ -679,8 +684,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ error: error.errors });
       }
-      console.error("Email analysis error:", error);
-      res.status(500).json({ error: "Failed to analyze email" });
+      console.error("❌ Email analysis route error:", error);
+      res.status(500).json({ 
+        error: "Email analysis failed", 
+        message: error instanceof Error ? error.message : "Unknown error" 
+      });
     }
   });
 
@@ -691,6 +699,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(404).json({ error: "Analysis not found - results are not persisted" });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch analysis" });
+    }
+  });
+
+  // MITRE ATT&CK API routes
+  app.get("/api/mitre/technique/:id", async (req, res) => {
+    try {
+      const technique = await mitreAttackService.getTechnique(req.params.id);
+      if (!technique) {
+        return res.status(404).json({ error: "Technique not found" });
+      }
+      res.json(technique);
+    } catch (error) {
+      console.error("MITRE technique lookup error:", error);
+      res.status(500).json({ error: "Failed to fetch technique data" });
+    }
+  });
+
+  app.get("/api/mitre/tactic/:id", async (req, res) => {
+    try {
+      const tactic = await mitreAttackService.getTactic(req.params.id);
+      if (!tactic) {
+        return res.status(404).json({ error: "Tactic not found" });
+      }
+      res.json(tactic);
+    } catch (error) {
+      console.error("MITRE tactic lookup error:", error);
+      res.status(500).json({ error: "Failed to fetch tactic data" });
+    }
+  });
+
+  app.get("/api/mitre/tactics", async (req, res) => {
+    try {
+      const tactics = await mitreAttackService.getAllTactics();
+      res.json(tactics);
+    } catch (error) {
+      console.error("MITRE tactics lookup error:", error);
+      res.status(500).json({ error: "Failed to fetch tactics data" });
+    }
+  });
+
+  app.get("/api/mitre/search", async (req, res) => {
+    try {
+      const query = req.query.q as string;
+      const limit = parseInt(req.query.limit as string) || 10;
+      
+      if (!query) {
+        return res.status(400).json({ error: "Query parameter 'q' is required" });
+      }
+
+      const techniques = await mitreAttackService.searchTechniques(query, limit);
+      res.json(techniques);
+    } catch (error) {
+      console.error("MITRE search error:", error);
+      res.status(500).json({ error: "Failed to search MITRE data" });
+    }
+  });
+
+  app.get("/api/mitre/status", async (req, res) => {
+    try {
+      const status = mitreAttackService.getStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("MITRE status error:", error);
+      res.status(500).json({ error: "Failed to get MITRE service status" });
+    }
+  });
+
+  app.post("/api/mitre/refresh", async (req, res) => {
+    try {
+      await mitreAttackService.refresh();
+      res.json({ message: "MITRE ATT&CK data refreshed successfully" });
+    } catch (error) {
+      console.error("MITRE refresh error:", error);
+      res.status(500).json({ error: "Failed to refresh MITRE data" });
     }
   });
 
