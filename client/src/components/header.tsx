@@ -1,5 +1,6 @@
-import { Shield, RefreshCw, Bell, User, Terminal, Users, BarChart3 } from "lucide-react";
+import { Shield, RefreshCw, Bell, User, Terminal, Users, BarChart3, Mail, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useLocation } from "wouter";
 import type { UserRole } from "@/types";
 
 interface HeaderProps {
@@ -9,6 +10,8 @@ interface HeaderProps {
 }
 
 export default function Header({ currentRole, onRoleSwitch, onRefresh }: HeaderProps) {
+  const [location] = useLocation();
+  
   return (
     <header className="bg-card border-b border-border px-6 py-4 relative">
       <div className="cyber-grid absolute inset-0 opacity-30"></div>
@@ -22,6 +25,32 @@ export default function Header({ currentRole, onRoleSwitch, onRefresh }: HeaderP
             <p className="text-sm text-muted-foreground">
               Advanced Threat Intelligence Platform
             </p>
+          </div>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          {/* Navigation */}
+          <div className="flex bg-secondary rounded-lg p-1">
+            <Link href="/dashboard">
+              <Button
+                variant={location === "/" || location === "/dashboard" ? "default" : "ghost"}
+                size="sm"
+                className="px-4 py-2"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+            <Link href="/email-analysis">
+              <Button
+                variant={location === "/email-analysis" ? "default" : "ghost"}
+                size="sm"
+                className="px-4 py-2"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Email Analysis
+              </Button>
+            </Link>
           </div>
         </div>
         

@@ -7,6 +7,7 @@ import { correlationEngine } from "./correlation-engine";
 import { playbookEngine } from "./playbook-engine";
 import { emailService } from "./email-service";
 import { siemIntegration } from "./siem-integration";
+import { emailAnalysisService } from "./email-analysis";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -644,6 +645,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch SIEM events" });
+    }
+  });
+
+  // Email Analysis routes
+  const emailAnalysisSchema = z.object({
+    email_content: z.string().min(1),
+    headers: z.record(z.string()).optional()
+  });
+
+  app.post("/api/email/analyze", async (req, res) => {
+    try {
+      const { email_content, headers } = emailAnalysisSchema.parse(req.body);
+      
+      const result = await emailAnalysisService.analyzeEmail({
+        emailContent: email_content,
+        headers
+      });
+
+      // Create an audit log entry for the analysis
+      await storage.createAuditLog({
+        actor: "USER",
+        action: "Email analysis performed",
+        metadata: { 
+          analysisId: result.id,
+          riskLevel: result.analysis.risk_score.risk_level,
+          primaryIntent: result.analysis.intent.primary_intent
+        }
+      });
+
+      res.json(result);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: error.errors });
+      }
+      console.error("Email analysis error:", error);
+      res.status(500).json({ error: "Failed to analyze email" });
+    }
+  });
+
+  app.get("/api/email/analysis/:id", async (req, res) => {
+    try {
+      // In a real implementation, you'd store analysis results
+      // For now, return a placeholder response
+      res.status(404).json({ error: "Analysis not found - results are not persisted" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch analysis" });
     }
   });
 

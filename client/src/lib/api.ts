@@ -57,5 +57,19 @@ export const api = {
   async getCorrelationAnalysis(alertId: string): Promise<any> {
     const response = await apiRequest("GET", `/api/correlations/${alertId}`);
     return response.json();
+  },
+
+  // Email Analysis
+  async analyzeEmail(emailContent: string, headers?: Record<string, string>): Promise<any> {
+    const response = await apiRequest("POST", "/api/email/analyze", { 
+      email_content: emailContent, 
+      headers 
+    });
+    return response.json();
+  },
+
+  async getEmailAnalysis(analysisId: string): Promise<any> {
+    const response = await apiRequest("GET", `/api/email/analysis/${analysisId}`);
+    return response.json();
   }
 };

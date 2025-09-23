@@ -1,0 +1,262 @@
+INFO:     Will watch for changes in these directories: ['/Users/kelvin/Desktop/kelveloper/IBM_FISHING/backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [31466] using WatchFiles
+INFO:     Started server process [31515]
+INFO:     Waiting for application startup.
+2025-09-20 13:53:59,399 - app.main - INFO - Starting PhishContext AI API | Context: {"timestamp": "2025-09-20T17:53:59.399423", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,399 - app.main - INFO - Primary LLM Provider: google | Context: {"timestamp": "2025-09-20T17:53:59.399640", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,399 - app.main - INFO - Fallback LLM Provider: openai | Context: {"timestamp": "2025-09-20T17:53:59.399796", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,399 - app.utils.performance - INFO - Background performance monitoring started | Context: {"timestamp": "2025-09-20T17:53:59.399912", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,400 - app.main - INFO - Performance monitoring started | Context: {"timestamp": "2025-09-20T17:53:59.399993", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,400 - app.services.cache_service - INFO - Background cache cleanup started | Context: {"timestamp": "2025-09-20T17:53:59.400072", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,400 - app.main - INFO - Cache background cleanup started | Context: {"timestamp": "2025-09-20T17:53:59.400257", "service": "phishcontext-ai"}
+2025-09-20 13:53:59,400 - app.main - INFO - Security features enabled | Context: {"timestamp": "2025-09-20T17:53:59.400381", "service": "phishcontext-ai", "content_sanitization": true, "security_headers": true, "max_concurrent_requests": 50, "max_email_size_mb": 1}
+INFO:     Application startup complete.
+2025-09-20 13:57:06,266 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T17:57:06.266248", "service": "phishcontext-ai", "request_id": "req_1758391026266140", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "curl/8.7.1"}
+2025-09-20 13:57:06,273 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T17:57:06.273682", "service": "phishcontext-ai", "request_id": "req_1758391026266140", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.007524967193603516}
+INFO:     127.0.0.1:65075 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 13:59:10,888 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T17:59:10.888765", "service": "phishcontext-ai", "request_id": "req_1758391150888698", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 13:59:10,922 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T17:59:10.922314", "service": "phishcontext-ai", "request_id": "req_1758391150888698", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.03359818458557129}
+INFO:     127.0.0.1:49294 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:00:18,107 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:00:18.107090", "service": "phishcontext-ai", "request_id": "req_1758391218107003", "method": "OPTIONS", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:00:18,109 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:00:18.109558", "service": "phishcontext-ai", "request_id": "req_1758391218107003", "method": "OPTIONS", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 0.0025260448455810547}
+INFO:     127.0.0.1:49350 - "OPTIONS /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:00:18,113 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:00:18.113033", "service": "phishcontext-ai", "request_id": "req_1758391218112989", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:00:18,240 - app.api.dependencies - INFO - EmailParser service initialized
+2025-09-20 14:00:18,244 - app.api.dependencies - INFO - IOCExtractor service initialized
+2025-09-20 14:00:18,348 - app.services.llm_analyzer - INFO - OpenAI client initialized | Context: {"timestamp": "2025-09-20T18:00:18.348653", "service": "phishcontext-ai"}
+2025-09-20 14:00:18,395 - app.services.llm_analyzer - INFO - Anthropic client initialized | Context: {"timestamp": "2025-09-20T18:00:18.395135", "service": "phishcontext-ai"}
+2025-09-20 14:00:18,395 - app.services.llm_analyzer - INFO - Google Gemini client initialized | Context: {"timestamp": "2025-09-20T18:00:18.395356", "service": "phishcontext-ai"}
+2025-09-20 14:00:18,395 - app.api.dependencies - INFO - LLMAnalyzer service initialized
+2025-09-20 14:00:18,501 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758391218112989
+2025-09-20 14:00:18,508 - app.api.routes.analysis - INFO - Extracted IOCs: 1 URLs, 0 IPs, 0 domains
+2025-09-20 14:00:18,511 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:00:18.511100", "service": "phishcontext-ai", "request_id": "analysis_20250920_180018_508241", "email_content_length": 429, "client_ip": "internal"}
+2025-09-20 14:00:18,511 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:00:18.511798", "service": "phishcontext-ai", "request_id": "analysis_20250920_180018_508241", "provider": "google", "prompt_length": 908, "attempt": 1}
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1758391218.579182 1930867 alts_credentials.cc:93] ALTS creds ignored. Not running on GCP and untrusted ALTS is not enabled.
+2025-09-20 14:00:21,262 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:00:21.262674", "service": "phishcontext-ai", "request_id": "analysis_20250920_180018_508241", "provider": "google", "response_length": 1202, "processing_time_seconds": 2.754405, "success": true}
+2025-09-20 14:00:21,263 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:00:21.263859", "service": "phishcontext-ai", "request_id": "analysis_20250920_180018_508241", "processing_time_seconds": 2.755599, "llm_provider": "google", "success": true, "ioc_count": 1}
+2025-09-20 14:00:21,264 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 2.75s
+2025-09-20 14:00:21,323 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:00:21.323131", "service": "phishcontext-ai", "request_id": "req_1758391218112989", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 3.210130214691162}
+DEBUG: Starting analysis for request req_1758391218112989
+DEBUG: Extracting email content...
+DEBUG: Email content length: 583
+INFO:     127.0.0.1:49350 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:04:06,978 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:04:06.978493", "service": "phishcontext-ai", "request_id": "req_1758391446978454", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:04:07,086 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758391446978454
+2025-09-20 14:04:07,093 - app.api.routes.analysis - INFO - Extracted IOCs: 2 URLs, 0 IPs, 1 domains
+2025-09-20 14:04:07,094 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:04:07.094143", "service": "phishcontext-ai", "request_id": "analysis_20250920_180407_093832", "email_content_length": 401, "client_ip": "internal"}
+2025-09-20 14:04:07,094 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:04:07.094494", "service": "phishcontext-ai", "request_id": "analysis_20250920_180407_093832", "provider": "google", "prompt_length": 880, "attempt": 1}
+2025-09-20 14:04:09,329 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:04:09.329236", "service": "phishcontext-ai", "request_id": "analysis_20250920_180407_093832", "provider": "google", "response_length": 1100, "processing_time_seconds": 2.23539, "success": true}
+2025-09-20 14:04:09,329 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:04:09.329802", "service": "phishcontext-ai", "request_id": "analysis_20250920_180407_093832", "processing_time_seconds": 2.235962, "llm_provider": "google", "success": true, "ioc_count": 3}
+2025-09-20 14:04:09,329 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.MALWARE_DELIVERY, Risk Score: 7, Processing Time: 2.24s
+2025-09-20 14:04:09,380 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:04:09.380356", "service": "phishcontext-ai", "request_id": "req_1758391446978454", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 2.401890993118286}
+DEBUG: Starting analysis for request req_1758391446978454
+DEBUG: Extracting email content...
+DEBUG: Email content length: 548
+INFO:     127.0.0.1:49812 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:04:10,935 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:04:10.935857", "service": "phishcontext-ai", "request_id": "req_1758391450935742", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:04:10,943 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:04:10.943905", "service": "phishcontext-ai", "request_id": "req_1758391450935742", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.008136987686157227}
+INFO:     127.0.0.1:49812 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:04:34,185 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:04:34.184970", "service": "phishcontext-ai", "request_id": "req_1758391474184927", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:04:34,293 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758391474184927
+2025-09-20 14:04:34,300 - app.api.routes.analysis - INFO - Extracted IOCs: 1 URLs, 0 IPs, 0 domains
+2025-09-20 14:04:34,300 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:04:34.300740", "service": "phishcontext-ai", "request_id": "analysis_20250920_180434_300454", "email_content_length": 317, "client_ip": "internal"}
+2025-09-20 14:04:34,301 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:04:34.301056", "service": "phishcontext-ai", "request_id": "analysis_20250920_180434_300454", "provider": "google", "prompt_length": 796, "attempt": 1}
+2025-09-20 14:04:36,395 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:04:36.395450", "service": "phishcontext-ai", "request_id": "analysis_20250920_180434_300454", "provider": "google", "response_length": 1027, "processing_time_seconds": 2.094969, "success": true}
+2025-09-20 14:04:36,396 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:04:36.396724", "service": "phishcontext-ai", "request_id": "analysis_20250920_180434_300454", "processing_time_seconds": 2.096247, "llm_provider": "google", "success": true, "ioc_count": 1}
+2025-09-20 14:04:36,397 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 2.10s
+2025-09-20 14:04:36,455 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:04:36.455675", "service": "phishcontext-ai", "request_id": "req_1758391474184927", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 2.[SENSITIVE_DATA_REDACTED]}
+DEBUG: Starting analysis for request req_1758391474184927
+DEBUG: Extracting email content...
+DEBUG: Email content length: 458
+INFO:     127.0.0.1:49872 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:04:46,730 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:04:46.730850", "service": "phishcontext-ai", "request_id": "req_1758391486730770", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:04:46,841 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758391486730770
+2025-09-20 14:04:46,849 - app.api.routes.analysis - INFO - Extracted IOCs: 1 URLs, 0 IPs, 0 domains
+2025-09-20 14:04:46,850 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 2.10s
+2025-09-20 14:04:46,906 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:04:46.906735", "service": "phishcontext-ai", "request_id": "req_1758391486730770", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 0.17595434188842773}
+DEBUG: Starting analysis for request req_1758391486730770
+DEBUG: Extracting email content...
+DEBUG: Email content length: 458
+INFO:     127.0.0.1:49901 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:09:25,466 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:09:25.466090", "service": "phishcontext-ai", "request_id": "req_1758391765465572", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:09:25,470 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:09:25.470869", "service": "phishcontext-ai", "request_id": "req_1758391765465572", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.005217075347900391}
+INFO:     127.0.0.1:50068 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:13:37,369 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:13:37.369573", "service": "phishcontext-ai", "request_id": "req_1758392017369537", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "curl/8.7.1"}
+2025-09-20 14:13:37,474 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758392017369537
+2025-09-20 14:13:37,481 - app.api.routes.analysis - INFO - Extracted IOCs: 2 URLs, 1 IPs, 0 domains
+2025-09-20 14:13:37,482 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:13:37.482179", "service": "phishcontext-ai", "request_id": "analysis_20250920_181337_481851", "email_content_length": 461, "client_ip": "internal"}
+2025-09-20 14:13:37,482 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:13:37.482495", "service": "phishcontext-ai", "request_id": "analysis_20250920_181337_481851", "provider": "google", "prompt_length": 940, "attempt": 1}
+2025-09-20 14:13:40,566 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:13:40.566397", "service": "phishcontext-ai", "request_id": "analysis_20250920_181337_481851", "provider": "google", "response_length": 1468, "processing_time_seconds": 3.084528, "success": true}
+2025-09-20 14:13:40,567 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:13:40.567289", "service": "phishcontext-ai", "request_id": "analysis_20250920_181337_481851", "processing_time_seconds": 3.085429, "llm_provider": "google", "success": true, "ioc_count": 3}
+2025-09-20 14:13:40,567 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 3.09s
+2025-09-20 14:13:40,622 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:13:40.622881", "service": "phishcontext-ai", "request_id": "req_1758392017369537", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 3.[SENSITIVE_DATA_REDACTED]}
+DEBUG: Starting analysis for request req_1758392017369537
+DEBUG: Extracting email content...
+DEBUG: Email content length: 564
+INFO:     127.0.0.1:50215 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:16:52,911 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:16:52.911389", "service": "phishcontext-ai", "request_id": "req_1758392212911346", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "curl/8.7.1"}
+2025-09-20 14:16:52,915 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:16:52.915533", "service": "phishcontext-ai", "request_id": "req_1758392212911346", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.0041730403900146484}
+INFO:     127.0.0.1:50297 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:18:35,859 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:18:35.859499", "service": "phishcontext-ai", "request_id": "req_1758392315859446", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:18:35,877 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:18:35.877749", "service": "phishcontext-ai", "request_id": "req_1758392315859446", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.01827692985534668}
+INFO:     127.0.0.1:50395 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:18:37,814 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:18:37.814249", "service": "phishcontext-ai", "request_id": "req_1758392317814195", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:18:37,870 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:18:37.870399", "service": "phishcontext-ai", "request_id": "req_1758392317814195", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.05618405342102051}
+INFO:     127.0.0.1:50395 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:18:40,621 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:18:40.621282", "service": "phishcontext-ai", "request_id": "req_1758392320621210", "method": "OPTIONS", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:18:40,624 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:18:40.624001", "service": "phishcontext-ai", "request_id": "req_1758392320621210", "method": "OPTIONS", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 0.002772092819213867}
+INFO:     127.0.0.1:50395 - "OPTIONS /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:18:40,628 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:18:40.628406", "service": "phishcontext-ai", "request_id": "req_1758392320628347", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:18:40,735 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758392320628347
+2025-09-20 14:18:40,738 - app.api.routes.analysis - INFO - Extracted IOCs: 2 URLs, 1 IPs, 0 domains
+2025-09-20 14:18:40,738 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:18:40.738439", "service": "phishcontext-ai", "request_id": "analysis_20250920_181840_738227", "email_content_length": 612, "client_ip": "internal"}
+2025-09-20 14:18:40,738 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:18:40.738669", "service": "phishcontext-ai", "request_id": "analysis_20250920_181840_738227", "provider": "google", "prompt_length": 1091, "attempt": 1}
+2025-09-20 14:18:43,891 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:18:43.891253", "service": "phishcontext-ai", "request_id": "analysis_20250920_181840_738227", "provider": "google", "response_length": 1630, "processing_time_seconds": 3.153003, "success": true}
+2025-09-20 14:18:43,893 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:18:43.893527", "service": "phishcontext-ai", "request_id": "analysis_20250920_181840_738227", "processing_time_seconds": 3.155287, "llm_provider": "google", "success": true, "ioc_count": 3}
+2025-09-20 14:18:43,893 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 3.15s
+2025-09-20 14:18:43,953 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:18:43.953108", "service": "phishcontext-ai", "request_id": "req_1758392320628347", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 3.[SENSITIVE_DATA_REDACTED]}
+DEBUG: Starting analysis for request req_1758392320628347
+DEBUG: Extracting email content...
+DEBUG: Email content length: 717
+INFO:     127.0.0.1:50395 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:27:02,388 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:27:02.385015", "service": "phishcontext-ai", "request_id": "req_1758392822379125", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "curl/8.7.1"}
+2025-09-20 14:27:02,418 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:27:02.418397", "service": "phishcontext-ai", "request_id": "req_1758392822379125", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.03924894332885742}
+INFO:     127.0.0.1:50637 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:27:13,018 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:27:13.018319", "service": "phishcontext-ai", "request_id": "req_1758392833018261", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "curl/8.7.1"}
+2025-09-20 14:27:13,138 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758392833018261
+2025-09-20 14:27:13,156 - app.api.routes.analysis - INFO - Extracted IOCs: 2 URLs, 1 IPs, 0 domains
+2025-09-20 14:27:13,160 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:27:13.159999", "service": "phishcontext-ai", "request_id": "analysis_20250920_182713_157324", "email_content_length": 236, "client_ip": "internal"}
+2025-09-20 14:27:13,164 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:27:13.164007", "service": "phishcontext-ai", "request_id": "analysis_20250920_182713_157324", "provider": "google", "prompt_length": 715, "attempt": 1}
+2025-09-20 14:27:16,882 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:27:16.882122", "service": "phishcontext-ai", "request_id": "analysis_20250920_182713_157324", "provider": "google", "response_length": 1332, "processing_time_seconds": 3.724777, "success": true}
+2025-09-20 14:27:16,883 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:27:16.883853", "service": "phishcontext-ai", "request_id": "analysis_20250920_182713_157324", "processing_time_seconds": 3.726518, "llm_provider": "google", "success": true, "ioc_count": 3}
+2025-09-20 14:27:16,885 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 3.73s
+2025-09-20 14:27:17,064 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:27:17.064424", "service": "phishcontext-ai", "request_id": "req_1758392833018261", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 4.046151876449585}
+DEBUG: Starting analysis for request req_1758392833018261
+DEBUG: Extracting email content...
+DEBUG: Email content length: 339
+INFO:     127.0.0.1:50670 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:27:45,205 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:27:45.205545", "service": "phishcontext-ai", "request_id": "req_1758392865205493", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:27:45,235 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:27:45.235376", "service": "phishcontext-ai", "request_id": "req_1758392865205493", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.02986598014831543}
+INFO:     127.0.0.1:50707 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:27:57,463 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:27:57.463816", "service": "phishcontext-ai", "request_id": "req_1758392877463738", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:27:57,467 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:27:57.467088", "service": "phishcontext-ai", "request_id": "req_1758392877463738", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.003337860107421875}
+INFO:     127.0.0.1:50713 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:28:04,883 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:04.883203", "service": "phishcontext-ai", "request_id": "req_1758392884883151", "method": "OPTIONS", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:04,890 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:04.890885", "service": "phishcontext-ai", "request_id": "req_1758392884883151", "method": "OPTIONS", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 0.007708311080932617}
+INFO:     127.0.0.1:50721 - "OPTIONS /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:28:04,896 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:04.896407", "service": "phishcontext-ai", "request_id": "req_1758392884896340", "method": "POST", "path": "/api/analyze", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:05,005 - app.api.routes.analysis - INFO - Starting email analysis for request req_1758392884896340
+2025-09-20 14:28:05,007 - app.api.routes.analysis - INFO - Extracted IOCs: 2 URLs, 1 IPs, 0 domains
+2025-09-20 14:28:05,007 - app.services.llm_analyzer - INFO - Email analysis started | Context: {"timestamp": "2025-09-20T18:28:05.007500", "service": "phishcontext-ai", "request_id": "analysis_20250920_182805_007303", "email_content_length": 266, "client_ip": "internal"}
+2025-09-20 14:28:05,007 - app.services.llm_analyzer - INFO - LLM request initiated | Context: {"timestamp": "2025-09-20T18:28:05.007718", "service": "phishcontext-ai", "request_id": "analysis_20250920_182805_007303", "provider": "google", "prompt_length": 745, "attempt": 1}
+2025-09-20 14:28:07,734 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:07.734679", "service": "phishcontext-ai", "request_id": "req_1758392887734565", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:07,744 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:07.743991", "service": "phishcontext-ai", "request_id": "req_1758392887734565", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.00940704345703125}
+DEBUG: Starting analysis for request req_1758392884896340
+DEBUG: Extracting email content...
+DEBUG: Email content length: 369
+INFO:     127.0.0.1:50726 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:28:07,844 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:07.844283", "service": "phishcontext-ai", "request_id": "req_1758392887844212", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:07,849 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:07.849342", "service": "phishcontext-ai", "request_id": "req_1758392887844212", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.005103111267089844}
+INFO:     127.0.0.1:50734 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:28:07,952 - app.services.llm_analyzer - INFO - LLM response received | Context: {"timestamp": "2025-09-20T18:28:07.952252", "service": "phishcontext-ai", "request_id": "analysis_20250920_182805_007303", "provider": "google", "response_length": 1428, "processing_time_seconds": 2.944905, "success": true}
+2025-09-20 14:28:07,953 - app.services.llm_analyzer - INFO - Email analysis completed | Context: {"timestamp": "2025-09-20T18:28:07.953547", "service": "phishcontext-ai", "request_id": "analysis_20250920_182805_007303", "processing_time_seconds": 2.946232, "llm_provider": "google", "success": true, "ioc_count": 3}
+2025-09-20 14:28:07,954 - app.api.routes.analysis - INFO - Analysis completed - Intent: IntentType.CREDENTIAL_THEFT, Risk Score: 9, Processing Time: 2.95s
+2025-09-20 14:28:08,029 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:08.029002", "service": "phishcontext-ai", "request_id": "req_1758392884896340", "method": "POST", "path": "/api/analyze", "status_code": 200, "processing_time_seconds": 3.132646322250366}
+INFO:     127.0.0.1:50721 - "POST /api/analyze HTTP/1.1" 200 OK
+2025-09-20 14:28:18,299 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:18.299186", "service": "phishcontext-ai", "request_id": "req_1758392898299146", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:18,301 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:18.301743", "service": "phishcontext-ai", "request_id": "req_1758392898299146", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0025811195373535156}
+INFO:     127.0.0.1:50739 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:28:26,701 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:28:26.701880", "service": "phishcontext-ai", "request_id": "req_1758392906701802", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:28:26,705 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:28:26.704971", "service": "phishcontext-ai", "request_id": "req_1758392906701802", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0031499862670898438}
+INFO:     127.0.0.1:50743 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:29:07,818 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:29:07.818249", "service": "phishcontext-ai", "request_id": "req_1758392947818209", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:29:07,821 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:29:07.821266", "service": "phishcontext-ai", "request_id": "req_1758392947818209", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0030410289764404297}
+INFO:     127.0.0.1:50762 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:29:07,904 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:29:07.904491", "service": "phishcontext-ai", "request_id": "req_1758392947904455", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:29:07,906 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:29:07.906438", "service": "phishcontext-ai", "request_id": "req_1758392947904455", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0019712448120117188}
+INFO:     127.0.0.1:50769 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:30:07,748 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:30:07.748425", "service": "phishcontext-ai", "request_id": "req_1758393007748365", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:30:07,755 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:30:07.755003", "service": "phishcontext-ai", "request_id": "req_1758393007748365", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.006620883941650391}
+INFO:     127.0.0.1:50779 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:30:07,784 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:30:07.784049", "service": "phishcontext-ai", "request_id": "req_1758393007784010", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:30:07,787 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:30:07.787053", "service": "phishcontext-ai", "request_id": "req_1758393007784010", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0030241012573242188}
+INFO:     127.0.0.1:50784 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:31:07,751 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:31:07.751447", "service": "phishcontext-ai", "request_id": "req_1758393067751397", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:31:07,754 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:31:07.754633", "service": "phishcontext-ai", "request_id": "req_1758393067751397", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.0032203197479248047}
+INFO:     127.0.0.1:50793 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:31:07,772 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:31:07.772454", "service": "phishcontext-ai", "request_id": "req_1758393067772401", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:31:07,777 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:31:07.777845", "service": "phishcontext-ai", "request_id": "req_1758393067772401", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.005418062210083008}
+INFO:     127.0.0.1:50799 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:32:07,912 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:32:07.912795", "service": "phishcontext-ai", "request_id": "req_1758393127912738", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:32:07,935 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:32:07.932476", "service": "phishcontext-ai", "request_id": "req_1758393127912738", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.01970672607421875}
+INFO:     127.0.0.1:50802 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:32:08,196 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:32:08.196456", "service": "phishcontext-ai", "request_id": "req_1758393128196406", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:32:08,201 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:32:08.200972", "service": "phishcontext-ai", "request_id": "req_1758393128196406", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.004541873931884766}
+INFO:     127.0.0.1:50829 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:32:45,857 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:32:45.856972", "service": "phishcontext-ai", "request_id": "req_1758393165856907", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:32:45,862 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:32:45.862795", "service": "phishcontext-ai", "request_id": "req_1758393165856907", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.005839109420776367}
+INFO:     127.0.0.1:50837 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:33:07,740 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:33:07.740419", "service": "phishcontext-ai", "request_id": "req_1758393187740325", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:33:07,746 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:33:07.746871", "service": "phishcontext-ai", "request_id": "req_1758393187740325", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.006519794464111328}
+INFO:     127.0.0.1:50842 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:33:07,760 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:33:07.760118", "service": "phishcontext-ai", "request_id": "req_1758393187760063", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:33:07,764 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:33:07.764672", "service": "phishcontext-ai", "request_id": "req_1758393187760063", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.004591226577758789}
+INFO:     127.0.0.1:50850 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:33:40,266 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:33:40.266315", "service": "phishcontext-ai", "request_id": "req_1758393220266275", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:33:40,269 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:33:40.269686", "service": "phishcontext-ai", "request_id": "req_1758393220266275", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.0033957958221435547}
+INFO:     127.0.0.1:50861 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:33:40,575 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:33:40.575028", "service": "phishcontext-ai", "request_id": "req_1758393220574977", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:33:40,592 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:33:40.591997", "service": "phishcontext-ai", "request_id": "req_1758393220574977", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.016999006271362305}
+INFO:     127.0.0.1:50861 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:34:07,795 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:34:07.795709", "service": "phishcontext-ai", "request_id": "req_1758393247795641", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:34:07,815 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:34:07.815885", "service": "phishcontext-ai", "request_id": "req_1758393247795641", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.020222902297973633}
+INFO:     127.0.0.1:50876 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:34:08,005 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:34:08.005235", "service": "phishcontext-ai", "request_id": "req_1758393248005182", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:34:08,009 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:34:08.009283", "service": "phishcontext-ai", "request_id": "req_1758393248005182", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.004083871841430664}
+INFO:     127.0.0.1:50879 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:35:01,990 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:35:01.990908", "service": "phishcontext-ai", "request_id": "req_1758393301990838", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:35:01,995 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:35:01.995300", "service": "phishcontext-ai", "request_id": "req_1758393301990838", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.00444793701171875}
+INFO:     127.0.0.1:50887 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:35:04,210 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:35:04.210580", "service": "phishcontext-ai", "request_id": "req_1758393304210529", "method": "GET", "path": "/api/health", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:35:04,216 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:35:04.216757", "service": "phishcontext-ai", "request_id": "req_1758393304210529", "method": "GET", "path": "/api/health", "status_code": 200, "processing_time_seconds": 0.0062139034271240234}
+INFO:     127.0.0.1:50895 - "GET /api/health HTTP/1.1" 200 OK
+2025-09-20 14:35:07,754 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:35:07.754483", "service": "phishcontext-ai", "request_id": "req_1758393307754428", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:35:07,761 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:35:07.761330", "service": "phishcontext-ai", "request_id": "req_1758393307754428", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.006879091262817383}
+INFO:     127.0.0.1:50898 - "GET /api/alerts HTTP/1.1" 404 Not Found
+2025-09-20 14:36:07,744 - app.main - INFO - Request started | Context: {"timestamp": "2025-09-20T18:36:07.744806", "service": "phishcontext-ai", "request_id": "req_1758393367744144", "method": "GET", "path": "/api/alerts", "client_ip": "127.0.0.1", "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"}
+2025-09-20 14:36:07,751 - app.main - INFO - Request completed | Context: {"timestamp": "2025-09-20T18:36:07.751921", "service": "phishcontext-ai", "request_id": "req_1758393367744144", "method": "GET", "path": "/api/alerts", "status_code": 404, "processing_time_seconds": 0.007756948471069336}
+INFO:     127.0.0.1:50913 - "GET /api/alerts HTTP/1.1" 404 Not Found
+WARNING:  WatchFiles detected changes in 'app/services/ioc_extractor.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2025-09-20 14:36:24,743 - app.main - INFO - Shutting down PhishContext AI API | Context: {"timestamp": "2025-09-20T18:36:24.742968", "service": "phishcontext-ai"}
+2025-09-20 14:36:24,744 - app.utils.performance - INFO - Background performance monitoring stopped | Context: {"timestamp": "2025-09-20T18:36:24.744211", "service": "phishcontext-ai"}
+2025-09-20 14:36:24,744 - app.main - INFO - Performance monitoring stopped | Context: {"timestamp": "2025-09-20T18:36:24.744537", "service": "phishcontext-ai"}
+2025-09-20 14:36:24,747 - app.services.cache_service - INFO - Background cache cleanup stopped | Context: {"timestamp": "2025-09-20T18:36:24.747553", "service": "phishcontext-ai"}
+2025-09-20 14:36:24,747 - app.main - INFO - Cache background cleanup stopped | Context: {"timestamp": "2025-09-20T18:36:24.747922", "service": "phishcontext-ai"}
+2025-09-20 14:36:25,158 - app.main - INFO - Final memory cleanup completed | Context: {"timestamp": "2025-09-20T18:36:25.157977", "service": "phishcontext-ai"}
+INFO:     Application shutdown complete.
+INFO:     Finished server process [31515]
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00007ff85a722bc0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/services/ioc_extractor.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00007ff85a722bc0 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'app/utils/helpers.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00007ff85a722bc0 (most recent call first):
+  <no Python frame>
+INFO:     Stopping reloader process [31466]
