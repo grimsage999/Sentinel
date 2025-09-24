@@ -28,7 +28,7 @@ import {
   playbookExecutions
 } from "@shared/schema";
 import { randomUUID } from "crypto";
-import { db } from "./db";
+import { db as getDb } from "./db";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface IStorage {
@@ -81,17 +81,17 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async getAlerts(): Promise<Alert[]> {
-    return await db.select().from(alerts).orderBy(desc(alerts.timestamp));
+    return await getDb().select().from(alerts).orderBy(desc(alerts.timestamp));
   }
 
   async getAlert(id: string): Promise<Alert | undefined> {
-    const [alert] = await db.select().from(alerts).where(eq(alerts.id, id));
+    const [alert] = await getDb().select().from(alerts).where(eq(alerts.id, id));
     return alert || undefined;
   }
 
   async createAlert(alert: InsertAlert): Promise<Alert> {
     // Use a simple approach to get the next alert ID without full table scan
-    const result = await db.execute(sql`
+    const result = await getDb().execute(sql`
       SELECT COALESCE(MAX(CAST(SUBSTRING(id FROM 5) AS INTEGER)), 0) + 1 as next_num 
       FROM alerts 
       WHERE id LIKE 'ALT-%'
@@ -99,7 +99,7 @@ export class DatabaseStorage implements IStorage {
     const nextNum = (result.rows[0] as any)?.next_num || 1;
     const id = `ALT-${String(nextNum).padStart(5, '0')}`;
     
-    const [newAlert] = await db
+    const [newAlert] = await getDb()
       .insert(alerts)
       .values({ ...alert, id })
       .returning();
@@ -107,7 +107,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAlert(id: string, alert: Partial<Alert>): Promise<Alert | undefined> {
-    const [updated] = await db
+    const [updated] = await getDb()
       .update(alerts)
       .set(alert)
       .where(eq(alerts.id, id))
@@ -116,12 +116,12 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteAlert(id: string): Promise<boolean> {
-    const result = await db.delete(alerts).where(eq(alerts.id, id));
+    const result = await getDb().delete(alerts).where(eq(alerts.id, id));
     return result.rowCount !== null && result.rowCount > 0;
   }
 
   async getThreatIntelligence(alertId: string): Promise<ThreatIntelligence | undefined> {
-    const [intel] = await db
+    const [intel] = await getDb()
       .select()
       .from(threatIntelligence)
       .where(eq(threatIntelligence.alertId, alertId));
@@ -129,7 +129,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createThreatIntelligence(intel: InsertThreatIntelligence): Promise<ThreatIntelligence> {
-    const [newIntel] = await db
+    const [newIntel] = await getDb()
       .insert(threatIntelligence)
       .values(intel)
       .returning();
@@ -138,18 +138,18 @@ export class DatabaseStorage implements IStorage {
 
   async getIOCs(alertId?: string): Promise<IOC[]> {
     if (alertId) {
-      return await db.select().from(iocs).where(eq(iocs.alertId, alertId));
+      return await getDb().select().from(iocs).where(eq(iocs.alertId, alertId));
     }
-    return await db.select().from(iocs);
+    return await getDb().select().from(iocs);
   }
 
   async createIOC(ioc: InsertIOC): Promise<IOC> {
-    const [newIOC] = await db.insert(iocs).values(ioc).returning();
+    const [newIOC] = await getDb().insert(iocs).values(ioc).returning();
     return newIOC;
   }
 
   async enrichIOC(id: string, enrichmentData: any): Promise<IOC | undefined> {
-    const [updated] = await db
+    const [updated] = await getDb()
       .update(iocs)
       .set({ enrichmentData })
       .where(eq(iocs.id, id))
@@ -158,31 +158,31 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAuditLog(): Promise<AuditLog[]> {
-    return await db.select().from(auditLog).orderBy(desc(auditLog.timestamp));
+    return await getDb().select().from(auditLog).orderBy(desc(auditLog.timestamp));
   }
 
   async createAuditEntry(entry: InsertAuditLog): Promise<AuditLog> {
-    const [newEntry] = await db.insert(auditLog).values(entry).returning();
+    const [newEntry] = await getDb().insert(auditLog).values(entry).returning();
     return newEntry;
   }
 
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await getDb().select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await getDb().select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
   async createUser(user: InsertUser): Promise<User> {
-    const [newUser] = await db.insert(users).values(user).returning();
+    const [newUser] = await getDb().insert(users).values(user).returning();
     return newUser;
   }
 
   async getCorrelations(alertId: string): Promise<Correlation[]> {
-    return await db
+    return await getDb()
       .select()
       .from(correlations)
       .where(eq(correlations.primaryAlertId, alertId))
@@ -190,27 +190,27 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCorrelation(correlation: InsertCorrelation): Promise<Correlation> {
-    const [newCorrelation] = await db.insert(correlations).values(correlation).returning();
+    const [newCorrelation] = await getDb().insert(correlations).values(correlation).returning();
     return newCorrelation;
   }
 
   // Playbook operations
   async getPlaybooks(): Promise<Playbook[]> {
-    return await db.select().from(playbooks).orderBy(desc(playbooks.createdAt));
+    return await getDb().select().from(playbooks).orderBy(desc(playbooks.createdAt));
   }
 
   async getPlaybook(id: string): Promise<Playbook | undefined> {
-    const [playbook] = await db.select().from(playbooks).where(eq(playbooks.id, id));
+    const [playbook] = await getDb().select().from(playbooks).where(eq(playbooks.id, id));
     return playbook || undefined;
   }
 
   async createPlaybook(playbook: InsertPlaybook): Promise<Playbook> {
-    const [newPlaybook] = await db.insert(playbooks).values(playbook).returning();
+    const [newPlaybook] = await getDb().insert(playbooks).values(playbook).returning();
     return newPlaybook;
   }
 
   async updatePlaybook(id: string, playbookUpdate: Partial<Playbook>): Promise<Playbook | undefined> {
-    const [updated] = await db.update(playbooks)
+    const [updated] = await getDb().update(playbooks)
       .set({ ...playbookUpdate, updatedAt: sql`now()` })
       .where(eq(playbooks.id, id))
       .returning();
@@ -218,13 +218,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deletePlaybook(id: string): Promise<boolean> {
-    const result = await db.delete(playbooks).where(eq(playbooks.id, id));
+    const result = await getDb().delete(playbooks).where(eq(playbooks.id, id));
     return (result.rowCount || 0) > 0;
   }
 
   // Playbook Action operations
   async getPlaybookActions(playbookId: string): Promise<PlaybookAction[]> {
-    return await db
+    return await getDb()
       .select()
       .from(playbookActions)
       .where(eq(playbookActions.playbookId, playbookId))
@@ -232,34 +232,34 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createPlaybookAction(action: InsertPlaybookAction): Promise<PlaybookAction> {
-    const [newAction] = await db.insert(playbookActions).values(action).returning();
+    const [newAction] = await getDb().insert(playbookActions).values(action).returning();
     return newAction;
   }
 
   async deletePlaybookAction(id: string): Promise<boolean> {
-    const result = await db.delete(playbookActions).where(eq(playbookActions.id, id));
+    const result = await getDb().delete(playbookActions).where(eq(playbookActions.id, id));
     return (result.rowCount || 0) > 0;
   }
 
   // Playbook Execution operations
   async getPlaybookExecutions(alertId?: string): Promise<PlaybookExecution[]> {
     if (alertId) {
-      return await db
+      return await getDb()
         .select()
         .from(playbookExecutions)
         .where(eq(playbookExecutions.alertId, alertId))
         .orderBy(desc(playbookExecutions.startedAt));
     }
-    return await db.select().from(playbookExecutions).orderBy(desc(playbookExecutions.startedAt));
+    return await getDb().select().from(playbookExecutions).orderBy(desc(playbookExecutions.startedAt));
   }
 
   async createPlaybookExecution(execution: InsertPlaybookExecution): Promise<PlaybookExecution> {
-    const [newExecution] = await db.insert(playbookExecutions).values(execution).returning();
+    const [newExecution] = await getDb().insert(playbookExecutions).values(execution).returning();
     return newExecution;
   }
 
   async updatePlaybookExecution(id: string, execution: Partial<PlaybookExecution>): Promise<PlaybookExecution | undefined> {
-    const [updated] = await db.update(playbookExecutions)
+    const [updated] = await getDb().update(playbookExecutions)
       .set(execution)
       .where(eq(playbookExecutions.id, id))
       .returning();
@@ -277,44 +277,127 @@ export class DatabaseStorage implements IStorage {
       {
         type: "Phishing Email Campaign",
         severity: "Critical",
-        source: "Email Gateway",
+        source: "Email Security Gateway",
         status: "New",
-        confidence: 95,
-        affectedAssets: 12,
+        confidence: 98,
+        affectedAssets: 1,
         businessImpact: "High",
-        assignee: "Unassigned",
+        assignee: null,
         aiTriaged: true,
-        title: "Phishing Email Campaign Detected",
-        description: "Suspicious emails targeting C-level executives with credential harvesting attempts",
-        metadata: null
+        title: "PayPal Credential Harvesting Attempt",
+        description: "Sophisticated phishing email impersonating PayPal security team with credential harvesting links and suspicious IOCs detected",
+        metadata: {
+          emailFrom: "security@paypal-verification.com",
+          emailTo: "user@example.com",
+          subject: "Urgent: Verify Your Account Now!",
+          maliciousUrls: [
+            "http://paypal-secure-login.malicious-site.com/verify",
+            "https://paypal-verification.suspicious-domain.net"
+          ],
+          suspiciousIPs: ["203.0.113.45"],
+          phishingTechniques: ["Urgency Tactics", "Brand Impersonation", "Account Suspension Threat"],
+          mitreAttack: {
+            techniques: ["T1566.002", "T1598.003"],
+            tactics: ["Initial Access", "Collection"]
+          },
+          vtAnalysis: {
+            maliciousUrls: 2,
+            suspiciousScore: 92,
+            vtLinks: [
+              "https://www.virustotal.com/gui/url-analysis/u-abc123",
+              "https://www.virustotal.com/gui/url-analysis/u-def456"
+            ]
+          },
+          riskFactors: [
+            "Domain typosquatting detected",
+            "Suspicious IP geolocation", 
+            "No SPF/DKIM authentication",
+            "High urgency language patterns"
+          ]
+        }
       },
       {
-        type: "Suspicious Login Activity",
-        severity: "High",
-        source: "SIEM",
+        type: "Phishing Email Campaign",
+        severity: "High", 
+        source: "Email Security Gateway",
         status: "Triaging",
-        confidence: 82,
-        affectedAssets: 3,
-        businessImpact: "Medium",
-        assignee: "Sarah M.",
+        confidence: 94,
+        affectedAssets: 1,
+        businessImpact: "High",
+        assignee: "security-lead@company.com",
         aiTriaged: true,
-        title: "Suspicious Login Activity",
-        description: "Multiple failed login attempts from unusual geographic locations",
-        metadata: null
+        title: "Amazon Account Takeover Attempt",
+        description: "Phishing campaign targeting Amazon customers with account verification scam and malicious attachment",
+        metadata: {
+          emailFrom: "security@amazon-verification.com",
+          emailTo: "customer@example.com",
+          subject: "Amazon Security Alert - Verify Your Account", 
+          maliciousUrls: [
+            "http://amazon-secure-verify.fake-domain.com/login",
+            "https://aws-security-check.malicious-site.org/verify"
+          ],
+          suspiciousIPs: ["198.51.100.42"],
+          attachments: ["amazon_verification.pdf"],
+          phishingTechniques: ["Account Verification", "Security Alert Impersonation", "Fake Attachments"],
+          mitreAttack: {
+            techniques: ["T1566.001", "T1204.002"],
+            tactics: ["Initial Access", "Execution"]
+          },
+          vtAnalysis: {
+            maliciousUrls: 2,
+            suspiciousScore: 89,
+            vtLinks: [
+              "https://www.virustotal.com/gui/url-analysis/u-ghi789",
+              "https://www.virustotal.com/gui/url-analysis/u-jkl012"
+            ]
+          },
+          riskFactors: [
+            "Malicious PDF attachment",
+            "Domain impersonation",
+            "Suspicious sender reputation",
+            "Social engineering indicators"
+          ]
+        }
       },
       {
-        type: "Data Exfiltration Attempt",
-        severity: "Medium",
-        source: "Network Monitor",
-        status: "Investigating",
-        confidence: 76,
-        affectedAssets: 5,
-        businessImpact: "Medium",
-        assignee: "John D.",
+        type: "Phishing Email Campaign",
+        severity: "Critical",
+        source: "Email Security Gateway",
+        status: "New", 
+        confidence: 99,
+        affectedAssets: 1,
+        businessImpact: "High",
+        assignee: null,
         aiTriaged: true,
-        title: "Data Exfiltration Attempt",
-        description: "Unusual data transfer patterns detected on network perimeter",
-        metadata: null
+        title: "IRS Tax Refund Scam - High Confidence",
+        description: "Government impersonation phishing targeting tax refund processing with sophisticated social engineering",
+        metadata: {
+          emailFrom: "noreply@irs-refund.com",
+          emailTo: "taxpayer@example.com",
+          subject: "IRS Tax Refund - Action Required",
+          maliciousUrls: [
+            "http://irs-refund-portal.suspicious-site.com/claim"
+          ],
+          phishingTechniques: ["Government Impersonation", "Financial Incentive", "Urgent Action Required"],
+          mitreAttack: {
+            techniques: ["T1566.002", "T1598.002"],
+            tactics: ["Initial Access", "Collection"]
+          },
+          vtAnalysis: {
+            maliciousUrls: 1,
+            suspiciousScore: 96,
+            vtLinks: [
+              "https://www.virustotal.com/gui/url-analysis/u-mno345"
+            ]
+          },
+          riskFactors: [
+            "Government agency impersonation",
+            "Financial fraud indicators",
+            "Domain not associated with IRS", 
+            "Suspicious URL structure"
+          ],
+          emailContent: "You have a pending tax refund of $2,847. Claim your refund: http://irs-refund-portal.suspicious-site.com/claim"
+        }
       }
     ];
 
@@ -344,4 +427,160 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
-export const storage = new DatabaseStorage();
+export class StorageManager implements IStorage {
+  private actualStorage: IStorage | null = null;
+  private mockStorage: IStorage | null = null;
+
+  private async getStorage(): Promise<IStorage> {
+    if (this.actualStorage) {
+      return this.actualStorage;
+    }
+
+    if (this.mockStorage) {
+      return this.mockStorage;
+    }
+
+    try {
+      // Try to use database storage first
+      const getDb()Storage = new DatabaseStorage();
+      await getDb()Storage.getAlerts(); // Test connection
+      this.actualStorage = getDb()Storage;
+      return getDb()Storage;
+    } catch (error) {
+      console.log("Database operation failed, using mock data:", error.message || error);
+      const { MockStorage } = await import("./mock-storage");
+      this.mockStorage = new MockStorage();
+      return this.mockStorage;
+    }
+  }
+
+  async getAlerts(): Promise<Alert[]> {
+    const storage = await this.getStorage();
+    return storage.getAlerts();
+  }
+
+  async getAlert(id: string): Promise<Alert | undefined> {
+    const storage = await this.getStorage();
+    return storage.getAlert(id);
+  }
+
+  async createAlert(alert: InsertAlert): Promise<Alert> {
+    const storage = await this.getStorage();
+    return storage.createAlert(alert);
+  }
+
+  async updateAlert(id: string, alert: Partial<Alert>): Promise<Alert | undefined> {
+    const storage = await this.getStorage();
+    return storage.updateAlert(id, alert);
+  }
+
+  async deleteAlert(id: string): Promise<boolean> {
+    const storage = await this.getStorage();
+    return storage.deleteAlert(id);
+  }
+
+  async getThreatIntelligence(alertId: string): Promise<ThreatIntelligence | undefined> {
+    const storage = await this.getStorage();
+    return storage.getThreatIntelligence(alertId);
+  }
+
+  async createThreatIntelligence(intel: InsertThreatIntelligence): Promise<ThreatIntelligence> {
+    const storage = await this.getStorage();
+    return storage.createThreatIntelligence(intel);
+  }
+
+  async getIOCs(alertId?: string): Promise<IOC[]> {
+    const storage = await this.getStorage();
+    return storage.getIOCs(alertId);
+  }
+
+  async createIOC(ioc: InsertIOC): Promise<IOC> {
+    const storage = await this.getStorage();
+    return storage.createIOC(ioc);
+  }
+
+  async enrichIOC(id: string, enrichmentData: any): Promise<IOC | undefined> {
+    const storage = await this.getStorage();
+    return storage.enrichIOC(id, enrichmentData);
+  }
+
+  async getAuditLog(): Promise<AuditLog[]> {
+    const storage = await this.getStorage();
+    return storage.getAuditLog();
+  }
+
+  async createAuditEntry(entry: InsertAuditLog): Promise<AuditLog> {
+    const storage = await this.getStorage();
+    return storage.createAuditEntry(entry);
+  }
+
+  async getUsers(): Promise<User[]> {
+    const storage = await this.getStorage();
+    return storage.getUsers();
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const storage = await this.getStorage();
+    return storage.createUser(user);
+  }
+
+  async getCorrelations(alertId: string): Promise<Correlation[]> {
+    const storage = await this.getStorage();
+    return storage.getCorrelations(alertId);
+  }
+
+  async createCorrelation(correlation: InsertCorrelation): Promise<Correlation> {
+    const storage = await this.getStorage();
+    return storage.createCorrelation(correlation);
+  }
+
+  async getPlaybooks(): Promise<Playbook[]> {
+    const storage = await this.getStorage();
+    return storage.getPlaybooks();
+  }
+
+  async getPlaybook(id: string): Promise<Playbook | undefined> {
+    const storage = await this.getStorage();
+    return storage.getPlaybook(id);
+  }
+
+  async createPlaybook(playbook: InsertPlaybook): Promise<Playbook> {
+    const storage = await this.getStorage();
+    return storage.createPlaybook(playbook);
+  }
+
+  async getPlaybookActions(playbookId: string): Promise<PlaybookAction[]> {
+    const storage = await this.getStorage();
+    return storage.getPlaybookActions(playbookId);
+  }
+
+  async createPlaybookAction(action: InsertPlaybookAction): Promise<PlaybookAction> {
+    const storage = await this.getStorage();
+    return storage.createPlaybookAction(action);
+  }
+
+  async getPlaybookExecutions(playbookId?: string): Promise<PlaybookExecution[]> {
+    const storage = await this.getStorage();
+    return storage.getPlaybookExecutions(playbookId);
+  }
+
+  async createPlaybookExecution(execution: InsertPlaybookExecution): Promise<PlaybookExecution> {
+    const storage = await this.getStorage();
+    return storage.createPlaybookExecution(execution);
+  }
+
+  async updatePlaybookExecution(id: string, execution: Partial<PlaybookExecution>): Promise<PlaybookExecution | undefined> {
+    const storage = await this.getStorage();
+    return storage.updatePlaybookExecution(id, execution);
+  }
+
+  // Add the initializeSampleData method for mock storage compatibility
+  async initializeSampleData?(): Promise<void> {
+    const storage = await this.getStorage();
+    if ('initializeSampleData' in storage && typeof storage.initializeSampleData === 'function') {
+      await storage.initializeSampleData();
+    }
+  }
+}
+
+export const storage = new StorageManager();

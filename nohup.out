@@ -1,0 +1,158 @@
+🐍 Starting integrated Python email analysis backend...
+Database operation failed, using mock data: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://localhost/v2',
+    _req: null,
+    [Symbol(shapeMode)]: false,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+      at internalConnectMultiple (node:net:1122:18)
+      at afterConnectMultiple (node:net:1689:7) {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  },
+  [Symbol(kMessage)]: ''
+}
+Sample data initialized
+9:36:37 PM [express] Sample data initialized
+[PLAYBOOK] Initializing sample playbooks...
+[PLAYBOOK] Sample playbooks initialized successfully
+9:36:37 PM [express] Sample playbooks initialized
+Starting real-time threat intelligence feeds...
+9:36:37 PM [express] Real-time threat intelligence feeds started
+[SIEM] Connecting to all configured SIEM platforms...
+[SIEM] Connecting to Splunk Enterprise Security...
+[SIEM] Successfully connected to Splunk
+[SIEM] Successfully connected to Splunk Enterprise Security
+[SIEM] Connecting to IBM QRadar...
+[SIEM] Successfully connected to QRadar
+[SIEM] Successfully connected to IBM QRadar SIEM
+[SIEM] Connected to 2 SIEM platforms
+9:36:39 PM [express] SIEM platform integrations started
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 127.0.0.1:3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at doListen (node:net:2139:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 3001
+}
+
+Node.js v20.19.3
+🐍 Starting integrated Python email analysis backend...
+Database operation failed, using mock data: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://localhost/v2',
+    _req: null,
+    [Symbol(shapeMode)]: false,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+      at internalConnectMultiple (node:net:1122:18)
+      at afterConnectMultiple (node:net:1689:7) {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  },
+  [Symbol(kMessage)]: ''
+}
+Sample data initialized
+9:50:04 PM [express] Sample data initialized
+[PLAYBOOK] Initializing sample playbooks...
+[PLAYBOOK] Sample playbooks initialized successfully
+9:50:04 PM [express] Sample playbooks initialized
+Starting real-time threat intelligence feeds...
+9:50:04 PM [express] Real-time threat intelligence feeds started
+[SIEM] Connecting to all configured SIEM platforms...
+[SIEM] Connecting to Splunk Enterprise Security...
+[SIEM] Successfully connected to Splunk
+[SIEM] Successfully connected to Splunk Enterprise Security
+[SIEM] Connecting to IBM QRadar...
+[SIEM] Successfully connected to QRadar
+[SIEM] Successfully connected to IBM QRadar SIEM
+[SIEM] Connected to 2 SIEM platforms
+9:50:06 PM [express] SIEM platform integrations started
+node:events:502
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: listen EADDRINUSE: address already in use 127.0.0.1:3001
+    at Server.setupListenHandle [as _listen2] (node:net:1908:16)
+    at listenInCluster (node:net:1965:12)
+    at doListen (node:net:2139:7)
+    at process.processTicksAndRejections (node:internal/process/task_queues:83:21)
+Emitted 'error' event on Server instance at:
+    at emitErrorNT (node:net:1944:8)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  code: 'EADDRINUSE',
+  errno: -48,
+  syscall: 'listen',
+  address: '127.0.0.1',
+  port: 3001
+}
+
+Node.js v20.19.3

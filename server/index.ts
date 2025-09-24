@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { threatIntelManager } from "./threat-feeds";
 import { siemIntegration } from "./siem-integration";
 import { playbookEngine } from "./playbook-engine";
+import { emailAnalysisService } from "./email-analysis";
 
 const app = express();
 app.use(express.json());
@@ -99,5 +100,18 @@ app.use((req, res, next) => {
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen(port, "127.0.0.1", () => {
     log(`serving on port ${port}`);
+  });
+
+  // Handle graceful shutdown
+  process.on('SIGINT', () => {
+    console.log('\n🛑 Received SIGINT. Shutting down gracefully...');
+    emailAnalysisService.cleanup();
+    process.exit(0);
+  });
+
+  process.on('SIGTERM', () => {
+    console.log('🛑 Received SIGTERM. Shutting down gracefully...');
+    emailAnalysisService.cleanup();
+    process.exit(0);
   });
 })();

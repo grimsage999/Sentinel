@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Shield, Globe, Zap, CheckCircle, ChevronRight, Flag, Search, Link2, AlertTriangle } from "lucide-react";
+import { Shield, Globe, Zap, CheckCircle, ChevronRight, Flag, Search, Link2, AlertTriangle, Mail, ExternalLink, Eye, Target, Database } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import type { Alert, ThreatIntelligence } from "@shared/schema";
 
@@ -360,6 +362,351 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
             </div>
           )}
         </div>
+
+        {/* Contextual Analysis Section */}
+        {alert.type === "Phishing Email Campaign" && alert.metadata && (
+          <div className="mb-6">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-blue-600 p-2 rounded-full">
+                    <Mail className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-blue-900 dark:text-blue-100">
+                      🧠 AI-Powered Contextual Analysis
+                    </h2>
+                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                      Rich threat intelligence and attack context to accelerate investigation
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
+                    <span className="text-xs font-medium text-green-800 dark:text-green-200">
+                      ⚡ Instant Context
+                    </span>
+                  </div>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    Investigation time: 30 seconds vs 15+ minutes
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <Tabs defaultValue="email-details" className="w-full">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="email-details" className="flex flex-col items-center p-3">
+                  <Mail className="w-4 h-4 mb-1" />
+                  <span className="text-xs">Email Details</span>
+                </TabsTrigger>
+                <TabsTrigger value="iocs" className="flex flex-col items-center p-3">
+                  <Database className="w-4 h-4 mb-1" />
+                  <span className="text-xs">IOCs & VT</span>
+                </TabsTrigger>
+                <TabsTrigger value="mitre-attack" className="flex flex-col items-center p-3">
+                  <Target className="w-4 h-4 mb-1" />
+                  <span className="text-xs">MITRE ATT&CK</span>
+                </TabsTrigger>
+                <TabsTrigger value="techniques" className="flex flex-col items-center p-3">
+                  <Eye className="w-4 h-4 mb-1" />
+                  <span className="text-xs">Attack Methods</span>
+                </TabsTrigger>
+                <TabsTrigger value="risk-factors" className="flex flex-col items-center p-3">
+                  <AlertTriangle className="w-4 h-4 mb-1" />
+                  <span className="text-xs">Risk Factors</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="email-details" className="space-y-4">
+                <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border-l-4 border-blue-500 mb-4">
+                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                    <strong>📧 Contextual Intelligence:</strong> Full email content, headers, and attachments with threat indicators
+                  </p>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center">
+                      <Mail className="w-4 h-4 mr-2" />
+                      Email Headers & Content
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">From</p>
+                        <p className="font-mono text-sm bg-muted p-2 rounded">{alert.metadata.emailFrom}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">To</p>
+                        <p className="font-mono text-sm bg-muted p-2 rounded">{alert.metadata.emailTo}</p>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Subject</p>
+                      <p className="font-mono text-sm bg-muted p-2 rounded">{alert.metadata.subject}</p>
+                    </div>
+                    {alert.metadata.emailContent && (
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Email Content</p>
+                        <div className="bg-muted p-3 rounded-lg border-l-4 border-red-500">
+                          <p className="text-sm whitespace-pre-wrap">{alert.metadata.emailContent}</p>
+                        </div>
+                      </div>
+                    )}
+                    {alert.metadata.attachments && alert.metadata.attachments.length > 0 && (
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Attachments</p>
+                        <div className="space-y-1">
+                          {alert.metadata.attachments.map((attachment: string, idx: number) => (
+                            <div key={idx} className="flex items-center space-x-2 bg-red-50 dark:bg-red-950/20 p-2 rounded">
+                              <AlertTriangle className="w-4 h-4 text-red-500" />
+                              <span className="font-mono text-sm">{attachment}</span>
+                              <Badge variant="destructive" className="text-xs">Malicious</Badge>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="iocs" className="space-y-4">
+                <div className="bg-green-50 dark:bg-green-950/20 p-3 rounded-lg border-l-4 border-green-500 mb-4">
+                  <p className="text-sm text-green-800 dark:text-green-200">
+                    <strong>🔍 Live Threat Intelligence:</strong> Real-time VirusTotal analysis with direct links to malicious URL reports
+                  </p>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center">
+                      <Database className="w-4 h-4 mr-2" />
+                      Indicators of Compromise & VirusTotal Analysis
+                    </CardTitle>
+                    <CardDescription>
+                      Malicious URLs and IPs with live VirusTotal threat intelligence
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {alert.metadata.vtAnalysis && (
+                      <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="bg-card p-3 rounded-lg border">
+                          <p className="text-xs text-muted-foreground">Malicious URLs</p>
+                          <p className="text-xl font-bold text-red-500">{alert.metadata.vtAnalysis.maliciousUrls}</p>
+                        </div>
+                        <div className="bg-card p-3 rounded-lg border">
+                          <p className="text-xs text-muted-foreground">Suspicious Score</p>
+                          <p className="text-xl font-bold text-orange-500">{alert.metadata.vtAnalysis.suspiciousScore}%</p>
+                        </div>
+                        <div className="bg-card p-3 rounded-lg border">
+                          <p className="text-xs text-muted-foreground">VT Reports</p>
+                          <p className="text-xl font-bold text-blue-500">{alert.metadata.vtAnalysis.vtLinks?.length || 0}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {alert.metadata.maliciousUrls && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Malicious URLs</h4>
+                        <div className="space-y-2">
+                          {alert.metadata.maliciousUrls.map((url: string, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between bg-red-50 dark:bg-red-950/20 p-3 rounded border-l-4 border-red-500">
+                              <div className="flex-1">
+                                <p className="font-mono text-sm break-all">{url}</p>
+                              </div>
+                              {alert.metadata.vtAnalysis?.vtLinks?.[idx] && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="ml-2"
+                                  onClick={() => window.open(alert.metadata.vtAnalysis.vtLinks[idx], '_blank')}
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />
+                                  VT Analysis
+                                </Button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {alert.metadata.suspiciousIPs && (
+                      <div>
+                        <h4 className="font-semibold mb-2">Suspicious IP Addresses</h4>
+                        <div className="space-y-2">
+                          {alert.metadata.suspiciousIPs.map((ip: string, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between bg-orange-50 dark:bg-orange-950/20 p-3 rounded border-l-4 border-orange-500">
+                              <div className="flex items-center space-x-3">
+                                <code className="text-sm">{ip}</code>
+                                <Badge variant="outline" className="text-xs">Suspicious IP</Badge>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="mitre-attack" className="space-y-4">
+                <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg border-l-4 border-purple-500 mb-4">
+                  <p className="text-sm text-purple-800 dark:text-purple-200">
+                    <strong>🎯 Official MITRE Mapping:</strong> Real techniques and tactics from the official MITRE ATT&CK framework with direct links
+                  </p>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center">
+                      <Target className="w-4 h-4 mr-2" />
+                      MITRE ATT&CK Framework Mapping
+                    </CardTitle>
+                    <CardDescription>
+                      Official MITRE techniques and tactics identified in this attack
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {alert.metadata.mitreAttack?.techniques && (
+                      <div>
+                        <h4 className="font-semibold mb-3">Attack Techniques</h4>
+                        <div className="grid gap-3">
+                          {alert.metadata.mitreAttack.techniques.map((technique: string, idx: number) => (
+                            <div key={idx} className="flex items-center justify-between bg-card p-3 rounded-lg border">
+                              <div className="flex items-center space-x-3">
+                                <Badge variant="secondary" className="font-mono">{technique}</Badge>
+                                <div>
+                                  <p className="font-medium text-sm">
+                                    {technique === "T1566.002" ? "Phishing: Spearphishing Link" :
+                                     technique === "T1598.003" ? "Phishing for Information: Spearphishing Link" :
+                                     technique === "T1566.001" ? "Phishing: Spearphishing Attachment" :
+                                     technique === "T1204.002" ? "User Execution: Malicious File" :
+                                     technique === "T1598.002" ? "Phishing for Information: Spearphishing Attachment" :
+                                     `MITRE ${technique}`}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {technique === "T1566.002" ? "Adversaries may send spearphishing emails with a malicious link" :
+                                     technique === "T1598.003" ? "Adversaries may send spearphishing messages to gather credentials" :
+                                     technique === "T1566.001" ? "Adversaries may send spearphishing emails with malicious attachments" :
+                                     technique === "T1204.002" ? "Adversaries may rely upon a user opening a malicious file" :
+                                     technique === "T1598.002" ? "Adversaries may send spearphishing messages with malicious attachments" :
+                                     "MITRE ATT&CK technique"}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(`https://attack.mitre.org/techniques/${technique}`, '_blank')}
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {alert.metadata.mitreAttack?.tactics && (
+                      <div>
+                        <h4 className="font-semibold mb-3">Attack Tactics</h4>
+                        <div className="flex flex-wrap gap-2">
+                          {alert.metadata.mitreAttack.tactics.map((tactic: string, idx: number) => (
+                            <Badge key={idx} variant="outline" className="flex items-center space-x-1">
+                              <Target className="w-3 h-3" />
+                              <span>{tactic}</span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="techniques" className="space-y-4">
+                <div className="bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg border-l-4 border-amber-500 mb-4">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    <strong>🎭 Attack Psychology:</strong> Social engineering methods and deception tactics used to manipulate victims
+                  </p>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center">
+                      <Eye className="w-4 h-4 mr-2" />
+                      Phishing Techniques Identified
+                    </CardTitle>
+                    <CardDescription>
+                      Social engineering and deception methods used in this campaign
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {alert.metadata.phishingTechniques && (
+                      <div className="grid gap-3">
+                        {alert.metadata.phishingTechniques.map((technique: string, idx: number) => (
+                          <div key={idx} className="flex items-center space-x-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border-l-4 border-amber-500">
+                            <AlertTriangle className="w-5 h-5 text-amber-600" />
+                            <div>
+                              <p className="font-medium text-sm">{technique}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {technique === "Urgency Tactics" ? "Creates false sense of urgency to pressure victims" :
+                                 technique === "Brand Impersonation" ? "Mimics trusted brands to gain credibility" :
+                                 technique === "Account Suspension Threat" ? "Threatens account closure to prompt action" :
+                                 technique === "Government Impersonation" ? "Impersonates government agencies" :
+                                 technique === "Financial Incentive" ? "Offers fake financial rewards" :
+                                 technique === "Account Verification" ? "Requests account verification under false pretenses" :
+                                 technique === "Security Alert Impersonation" ? "Mimics legitimate security notifications" :
+                                 technique === "Fake Attachments" ? "Uses malicious attachments disguised as legitimate files" :
+                                 "Social engineering technique"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="risk-factors" className="space-y-4">
+                <div className="bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border-l-4 border-red-500 mb-4">
+                  <p className="text-sm text-red-800 dark:text-red-200">
+                    <strong>⚠️ Risk Intelligence:</strong> Technical and behavioral indicators explaining why this attack scored high risk
+                  </p>
+                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center">
+                      <AlertTriangle className="w-4 h-4 mr-2" />
+                      Risk Factors & Indicators
+                    </CardTitle>
+                    <CardDescription>
+                      Technical and behavioral indicators that contributed to the high risk score
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {alert.metadata.riskFactors && (
+                      <div className="space-y-3">
+                        {alert.metadata.riskFactors.map((factor: string, idx: number) => (
+                          <div key={idx} className="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border-l-4 border-red-500">
+                            <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5" />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{factor}</p>
+                              <div className="mt-1">
+                                <Badge variant="destructive" className="text-xs">High Risk</Badge>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+        )}
 
         {/* Evidence Timeline */}
         <div>

@@ -1,0 +1,77 @@
+🐍 Starting integrated Python email analysis backend...
+Database operation failed, using mock data: ErrorEvent {
+  [Symbol(kTarget)]: WebSocket {
+    _events: [Object: null prototype] {
+      error: [Function],
+      message: [Function],
+      close: [Function],
+      open: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'arraybuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: <Buffer >,
+    _closeTimer: null,
+    _errorEmitted: true,
+    _extensions: {},
+    _paused: false,
+    _protocol: '',
+    _readyState: 3,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _autoPong: true,
+    _url: 'wss://localhost/v2',
+    _req: null,
+    [Symbol(shapeMode)]: false,
+    [Symbol(kCapture)]: false
+  },
+  [Symbol(kType)]: 'error',
+  [Symbol(kError)]: AggregateError [ECONNREFUSED]: 
+      at internalConnectMultiple (node:net:1122:18)
+      at afterConnectMultiple (node:net:1689:7) {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  },
+  [Symbol(kMessage)]: ''
+}
+Sample data initialized
+9:36:25 PM [express] Sample data initialized
+[PLAYBOOK] Initializing sample playbooks...
+[PLAYBOOK] Sample playbooks initialized successfully
+9:36:25 PM [express] Sample playbooks initialized
+Starting real-time threat intelligence feeds...
+9:36:25 PM [express] Real-time threat intelligence feeds started
+[SIEM] Connecting to all configured SIEM platforms...
+[SIEM] Connecting to Splunk Enterprise Security...
+[SIEM] Successfully connected to Splunk
+[SIEM] Successfully connected to Splunk Enterprise Security
+[SIEM] Connecting to IBM QRadar...
+[SIEM] Successfully connected to QRadar
+[SIEM] Successfully connected to IBM QRadar SIEM
+[SIEM] Connected to 2 SIEM platforms
+9:36:27 PM [express] SIEM platform integrations started
+9:36:27 PM [express] serving on port 3001
+[Python Backend] 2025-09-22 21:36:29,783 - app.main - INFO - Starting PhishContext AI API | Context: {"timestamp": "2025-09-23T01:36:29.783001", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,783 - app.main - INFO - Primary LLM Provider: openai | Context: {"timestamp": "2025-09-23T01:36:29.783187", "service": "phishcontext-ai"}
+2025-09-22 21:36:29,783 - app.main - INFO - Fallback LLM Provider: anthropic | Context: {"timestamp": "2025-09-23T01:36:29.783373", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,784 - app.utils.performance - INFO - Background performance monitoring started | Context: {"timestamp": "2025-09-23T01:36:29.783486", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,784 - app.main - INFO - Performance monitoring started | Context: {"timestamp": "2025-09-23T01:36:29.784541", "service": "phishcontext-ai"}
+2025-09-22 21:36:29,784 - app.services.cache_service - INFO - Background cache cleanup started | Context: {"timestamp": "2025-09-23T01:36:29.784678", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,784 - app.main - INFO - Cache background cleanup started | Context: {"timestamp": "2025-09-23T01:36:29.784766", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,784 - app.main - INFO - Security features enabled | Context: {"timestamp": "2025-09-23T01:36:29.784838", "service": "phishcontext-ai", "content_sanitization": true, "security_headers": true, "max_concurrent_requests": 50, "max_email_size_mb": 10}
+[Python Backend] ERROR:    [Errno 48] error while attempting to bind on address ('127.0.0.1', 8000): address already in use
+[Python Backend] 2025-09-22 21:36:29,789 - app.main - INFO - Shutting down PhishContext AI API | Context: {"timestamp": "2025-09-23T01:36:29.789341", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,789 - app.utils.performance - INFO - Background performance monitoring stopped | Context: {"timestamp": "2025-09-23T01:36:29.789646", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,789 - app.main - INFO - Performance monitoring stopped | Context: {"timestamp": "2025-09-23T01:36:29.789806", "service": "phishcontext-ai"}
+2025-09-22 21:36:29,790 - app.services.cache_service - INFO - Background cache cleanup stopped | Context: {"timestamp": "2025-09-23T01:36:29.790064", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,790 - app.main - INFO - Cache background cleanup stopped | Context: {"timestamp": "2025-09-23T01:36:29.790204", "service": "phishcontext-ai"}
+[Python Backend] 2025-09-22 21:36:29,842 - app.main - INFO - Final memory cleanup completed | Context: {"timestamp": "2025-09-23T01:36:29.842158", "service": "phishcontext-ai"}
+Python backend exited with code 1
+🛑 Received SIGTERM. Shutting down gracefully...
