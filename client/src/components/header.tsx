@@ -20,7 +20,7 @@ export default function Header({ currentRole, onRoleSwitch, onRefresh }: HeaderP
           <Shield className="w-8 h-8 text-primary" />
           <div>
             <h1 className="text-2xl font-bold gradient-text">
-              Cyber-Sentinel Workbench
+              Cognito
             </h1>
             <p className="text-sm text-muted-foreground">
               Understand Before You Click.
