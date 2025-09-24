@@ -782,6 +782,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Quick Actions API Routes
+  app.post("/api/incidents", async (req, res) => {
+    try {
+      const incidentData = {
+        id: `incident-${Date.now()}`,
+        title: req.body.title || `Security Incident ${new Date().toISOString().split('T')[0]}`,
+        description: req.body.description || "New security incident created from dashboard",
+        severity: req.body.severity || "Medium",
+        status: "Open",
+        assignee: req.body.assignee || "Alex Chen",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        tags: req.body.tags || [],
+        relatedAlerts: req.body.relatedAlerts || []
+      };
+
+      // Create audit log entry
+      const auditEntry = {
+        id: `audit-${Date.now()}`,
+        timestamp: new Date(),
+        actor: "USER",
+        action: `Created incident: ${incidentData.title}`,
+        resource: "incident",
+        resourceId: incidentData.id
+      };
+      await storage.createAuditLog(auditEntry);
+      
+      res.status(201).json(incidentData);
+    } catch (error) {
+      console.error("Failed to create incident:", error);
+      res.status(500).json({ error: "Failed to create incident" });
+    }
+  });
+
+  app.post("/api/share", async (req, res) => {
+    try {
+      const shareData = {
+        id: `share-${Date.now()}`,
+        type: req.body.type || "alert",
+        resourceId: req.body.resourceId,
+        sharedBy: req.body.sharedBy || "Alex Chen",
+        sharedWith: req.body.sharedWith || [],
+        shareUrl: req.body.shareUrl || "",
+        expiresAt: req.body.expiresAt || new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+        createdAt: new Date()
+      };
+
+      // Create audit log entry
+      const auditEntry = {
+        id: `audit-${Date.now()}`,
+        timestamp: new Date(),
+        actor: "USER", 
+        action: `Shared ${shareData.type}: ${shareData.resourceId}`,
+        resource: shareData.type,
+        resourceId: shareData.resourceId
+      };
+      await storage.createAuditLog(auditEntry);
+
+      res.status(201).json({ success: true, shareData });
+    } catch (error) {
+      console.error("Failed to create share:", error);
+      res.status(500).json({ error: "Failed to share resource" });
+    }
+  });
+
+  app.get("/api/export", async (req, res) => {
+    try {
+      const exportType = req.query.type as string || "full";
+      const format = req.query.format as string || "json";
+      
+      let exportData: any = {};
+      
+      switch (exportType) {
+        case "alerts":
+          exportData = {
+            type: "alerts",
+            data: await storage.getAlerts(),
+            exportedAt: new Date(),
+            exportedBy: "Alex Chen"
+          };
+          break;
+        case "audit":
+          exportData = {
+            type: "audit-log",
+            data: await storage.getAuditLog(),
+            exportedAt: new Date(),
+            exportedBy: "Alex Chen"
+          };
+          break;
+        case "threats":
+          exportData = {
+            type: "threat-intelligence", 
+            data: await Promise.all([
+              storage.getAlerts().then(alerts => alerts.slice(0, 20)),
+              storage.getAuditLog().then(logs => logs.slice(0, 50))
+            ]),
+            exportedAt: new Date(),
+            exportedBy: "Alex Chen"
+          };
+          break;
+        default: // full export
+          exportData = {
+            type: "full-export",
+            alerts: await storage.getAlerts(),
+            auditLog: await storage.getAuditLog(),
+            systemStatus: [
+              { name: "Email Gateway", status: "Online", uptime: "99.9%" },
+              { name: "SIEM Platform", status: "Online", uptime: "99.8%" },
+              { name: "EDR Agents", status: "98.2%", uptime: "98.2%" }
+            ],
+            exportedAt: new Date(),
+            exportedBy: "Alex Chen"
+          };
+      }
+
+      // Create audit log entry
+      const auditEntry = {
+        id: `audit-${Date.now()}`,
+        timestamp: new Date(),
+        actor: "USER",
+        action: `Exported ${exportType} data in ${format} format`,
+        resource: "export"
+      };
+      await storage.createAuditLog(auditEntry);
+
+      if (format === "csv" && exportType === "alerts") {
+        // Convert alerts to CSV
+        const alerts = exportData.alerts || exportData.data;
+        const csvHeaders = "ID,Title,Severity,Status,Created At,Type\n";
+        const csvRows = alerts.map((alert: any) => 
+          `"${alert.id}","${alert.title}","${alert.severity}","${alert.status}","${alert.timestamp}","${alert.type}"`
+        ).join("\n");
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', `attachment; filename="cognito-${exportType}-${new Date().toISOString().split('T')[0]}.csv"`);
+        res.send(csvHeaders + csvRows);
+      } else {
+        // JSON export
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', `attachment; filename="cognito-${exportType}-${new Date().toISOString().split('T')[0]}.json"`);
+        res.json(exportData);
+      }
+    } catch (error) {
+      console.error("Failed to export data:", error);
+      res.status(500).json({ error: "Failed to export data" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
