@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Shield, Globe, Zap, CheckCircle, ChevronRight, Flag, Search, Link2, AlertTriangle, Mail, ExternalLink, Eye, Target, Database } from "lucide-react";
+import { Globe, Zap, CheckCircle, ChevronRight, Flag, Search, Link2, AlertTriangle, Mail, ExternalLink, Eye, Target, Database } from "lucide-react";
+import logoImg from "@assets/unnamed_1758744382590.png";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -86,7 +87,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
       <div className="flex-1 bg-background border-r border-border overflow-y-auto scroll-area">
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
-            <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <img src={logoImg} alt="Cognito Logo" className="w-16 h-16 mx-auto mb-4 rounded-lg opacity-60" />
             <h3 className="text-xl font-semibold mb-2">Select an Alert to Investigate</h3>
             <p className="text-muted-foreground">Choose an alert from the left panel to begin your investigation</p>
           </div>

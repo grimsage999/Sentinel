@@ -1,4 +1,5 @@
-import { Shield, RefreshCw, Bell, User, Terminal, Users, BarChart3, Mail, Home } from "lucide-react";
+import { RefreshCw, Bell, User, Terminal, Users, BarChart3, Mail, Home } from "lucide-react";
+import logoImg from "@assets/unnamed_1758744382590.png";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
 import type { UserRole } from "@/types";
@@ -16,8 +17,12 @@ export default function Header({ currentRole, onRoleSwitch, onRefresh }: HeaderP
     <header className="bg-card border-b border-border px-6 py-4 relative">
       <div className="cyber-grid absolute inset-0 opacity-30"></div>
       <div className="relative flex justify-between items-center">
-        <div className="flex items-center space-x-4">
-          <Shield className="w-8 h-8 text-primary" />
+        <div className="flex items-center space-x-3">
+          <img 
+            src={logoImg} 
+            alt="Cognito Logo" 
+            className="w-10 h-10 rounded-lg" 
+          />
           <div>
             <h1 className="text-2xl font-bold gradient-text">
               Cognito

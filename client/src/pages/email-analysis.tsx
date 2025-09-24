@@ -4,7 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { AlertTriangle, Shield, Mail, Search, FileText } from "lucide-react";
+import { AlertTriangle, Mail, Search, FileText } from "lucide-react";
+import logoImg from "@assets/unnamed_1758744382590.png";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -199,7 +200,7 @@ Security Team`;
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+                <img src={logoImg} alt="Cognito Logo" className="h-5 w-5 rounded" />
                 Analysis Results
               </CardTitle>
               <CardDescription>
