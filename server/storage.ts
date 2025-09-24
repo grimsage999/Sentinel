@@ -442,12 +442,12 @@ export class StorageManager implements IStorage {
 
     try {
       // Try to use database storage first
-      const getDb()Storage = new DatabaseStorage();
-      await getDb()Storage.getAlerts(); // Test connection
-      this.actualStorage = getDb()Storage;
-      return getDb()Storage;
+      const dbStorage = new DatabaseStorage();
+      await dbStorage.getAlerts(); // Test connection
+      this.actualStorage = dbStorage;
+      return dbStorage;
     } catch (error) {
-      console.log("Database operation failed, using mock data:", error.message || error);
+      console.log("Database operation failed, using mock data:", error instanceof Error ? error.message : String(error));
       const { MockStorage } = await import("./mock-storage");
       this.mockStorage = new MockStorage();
       return this.mockStorage;

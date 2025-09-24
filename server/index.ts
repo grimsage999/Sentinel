@@ -56,7 +56,7 @@ app.use((req, res, next) => {
       await playbookEngine.initializeSamplePlaybooks();
       log("Sample playbooks initialized");
     } catch (error) {
-      log("Error initializing sample data:", error);
+      log(`Error initializing sample data: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -65,7 +65,7 @@ app.use((req, res, next) => {
     await threatIntelManager.startLiveFeedUpdates();
     log("Real-time threat intelligence feeds started");
   } catch (error) {
-    log("Error starting threat intelligence feeds:", error);
+    log(`Error starting threat intelligence feeds: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   // Initialize SIEM platform integrations
@@ -73,7 +73,7 @@ app.use((req, res, next) => {
     await siemIntegration.connectToAllPlatforms();
     log("SIEM platform integrations started");
   } catch (error) {
-    log("Error starting SIEM integrations:", error);
+    log(`Error starting SIEM integrations: ${error instanceof Error ? error.message : String(error)}`);
   }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
