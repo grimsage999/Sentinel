@@ -23,7 +23,7 @@ export default function Header({ currentRole, onRoleSwitch, onRefresh }: HeaderP
               Cyber-Sentinel Workbench
             </h1>
             <p className="text-sm text-muted-foreground">
-              Advanced Threat Intelligence Platform
+              Understand Before You Click.
             </p>
           </div>
         </div>
