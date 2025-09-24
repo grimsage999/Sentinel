@@ -31,6 +31,38 @@ interface CorrelationAnalysis {
   patterns: string[];
 }
 
+// Type guard for metadata
+type PhishingMetadata = {
+  emailFrom?: string;
+  emailTo?: string;
+  subject?: string;
+  emailContent?: string;
+  attachments?: string[];
+  vtAnalysis?: any;
+  maliciousUrls?: string[];
+  suspiciousIPs?: string[];
+  mitreAttack?: any;
+  phishingTechniques?: any[];
+  riskFactors?: any[];
+};
+
+const isPhishingMetadata = (metadata: unknown): metadata is PhishingMetadata => {
+  return typeof metadata === 'object' && metadata !== null;
+};
+
+// Helper function to safely access metadata properties
+const getMetadataProperty = (metadata: unknown, property: string): any => {
+  if (isPhishingMetadata(metadata)) {
+    return (metadata as any)[property];
+  }
+  return undefined;
+};
+
+// Helper function to safely check if value is a valid array
+const isValidArray = (value: unknown): value is Array<any> => {
+  return Array.isArray(value);
+};
+
 interface AlertDetailsProps {
   alert: Alert | null;
   onIOCEnrichment: () => void;
@@ -204,29 +236,29 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
               <div className="bg-card p-4 rounded-lg border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Malicious Score</p>
                 <p className="text-2xl font-bold text-red-400" data-testid="text-malicious-score">
-                  {threatIntel.maliciousScore}/100
+                  {threatIntel.maliciousScore || 0}/100
                 </p>
               </div>
               <div className="bg-card p-4 rounded-lg border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Previous Sightings</p>
                 <p className="text-2xl font-bold text-yellow-400" data-testid="text-previous-sightings">
-                  {threatIntel.previousSightings}
+                  {threatIntel.previousSightings || 0}
                 </p>
               </div>
               <div className="bg-card p-4 rounded-lg border border-border">
                 <p className="text-xs text-muted-foreground mb-1">Threat Actor</p>
                 <p className="text-lg font-bold text-purple-400" data-testid="text-threat-actor">
-                  {threatIntel.threatActor}
+                  {threatIntel.threatActor || 'Unknown'}
                 </p>
               </div>
             </div>
             
             {/* IOCs */}
-            {threatIntel.iocs && Array.isArray(threatIntel.iocs) && (
+            {isValidArray(threatIntel.iocs) && (
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Indicators of Compromise (IOCs)</p>
                 <div className="space-y-2">
-                  {(threatIntel.iocs as Array<{type: string, value: string, reputation: string}>).map((ioc, idx) => (
+                  {threatIntel.iocs.map((ioc: any, idx: number) => (
                     <div key={idx} className="flex items-center justify-between bg-card rounded p-3 text-sm border border-border">
                       <div className="flex items-center space-x-3">
                         <span className="text-muted-foreground">{ioc.type}:</span>
@@ -364,30 +396,30 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
         </div>
 
         {/* Contextual Analysis Section */}
-        {alert.type === "Phishing Email Campaign" && alert.metadata && (
+        {alert.type === "Phishing Email Campaign" && alert.metadata && isPhishingMetadata(alert.metadata) && (
           <div className="mb-6">
             <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800 mb-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                 <div className="flex items-center space-x-3">
-                  <div className="bg-blue-600 p-2 rounded-full">
+                  <div className="bg-blue-600 p-2 rounded-full flex-shrink-0">
                     <Mail className="w-5 h-5 text-white" />
                   </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-blue-900 dark:text-blue-100">
+                  <div className="min-w-0 flex-1">
+                    <h2 className="text-lg lg:text-xl font-bold text-blue-900 dark:text-blue-100 break-words">
                       🧠 AI-Powered Contextual Analysis
                     </h2>
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
+                    <p className="text-sm text-blue-700 dark:text-blue-300 break-words">
                       Rich threat intelligence and attack context to accelerate investigation
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full">
-                    <span className="text-xs font-medium text-green-800 dark:text-green-200">
+                <div className="text-left lg:text-right flex-shrink-0">
+                  <div className="bg-green-100 dark:bg-green-900/30 px-3 py-1 rounded-full inline-block">
+                    <span className="text-xs font-medium text-green-800 dark:text-green-200 whitespace-nowrap">
                       ⚡ Instant Context
                     </span>
                   </div>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 whitespace-nowrap">
                     Investigation time: 30 seconds vs 15+ minutes
                   </p>
                 </div>
@@ -420,8 +452,9 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
               
               <TabsContent value="email-details" className="space-y-4">
                 <div className="bg-blue-50 dark:bg-blue-950/20 p-3 rounded-lg border-l-4 border-blue-500 mb-4">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>📧 Contextual Intelligence:</strong> Full email content, headers, and attachments with threat indicators
+                  <p className="text-sm text-blue-800 dark:text-blue-200 break-words">
+                    <strong className="font-semibold">📧 Contextual Intelligence:</strong>{" "}
+                    <span className="inline-block">Full email content, headers, and attachments with threat indicators</span>
                   </p>
                 </div>
                 <Card>
@@ -489,38 +522,38 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {alert.metadata.vtAnalysis && (
-                      <div className="grid grid-cols-3 gap-4 mb-4">
+                    {getMetadataProperty(alert.metadata, 'vtAnalysis') && (
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
                         <div className="bg-card p-3 rounded-lg border">
                           <p className="text-xs text-muted-foreground">Malicious URLs</p>
-                          <p className="text-xl font-bold text-red-500">{alert.metadata.vtAnalysis.maliciousUrls}</p>
+                          <p className="text-xl font-bold text-red-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.maliciousUrls || 0}</p>
                         </div>
                         <div className="bg-card p-3 rounded-lg border">
                           <p className="text-xs text-muted-foreground">Suspicious Score</p>
-                          <p className="text-xl font-bold text-orange-500">{alert.metadata.vtAnalysis.suspiciousScore}%</p>
+                          <p className="text-xl font-bold text-orange-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.suspiciousScore || 0}%</p>
                         </div>
                         <div className="bg-card p-3 rounded-lg border">
                           <p className="text-xs text-muted-foreground">VT Reports</p>
-                          <p className="text-xl font-bold text-blue-500">{alert.metadata.vtAnalysis.vtLinks?.length || 0}</p>
+                          <p className="text-xl font-bold text-blue-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.vtLinks?.length || 0}</p>
                         </div>
                       </div>
                     )}
                     
-                    {alert.metadata.maliciousUrls && (
+                    {alert.metadata.maliciousUrls && Array.isArray(alert.metadata.maliciousUrls) && (
                       <div>
                         <h4 className="font-semibold mb-2">Malicious URLs</h4>
-                        <div className="space-y-2">
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
                           {alert.metadata.maliciousUrls.map((url: string, idx: number) => (
-                            <div key={idx} className="flex items-center justify-between bg-red-50 dark:bg-red-950/20 p-3 rounded border-l-4 border-red-500">
-                              <div className="flex-1">
+                            <div key={idx} className="flex items-center justify-between bg-red-50 dark:bg-red-950/20 p-3 rounded border-l-4 border-red-500 gap-2">
+                              <div className="flex-1 min-w-0">
                                 <p className="font-mono text-sm break-all">{url}</p>
                               </div>
-                              {alert.metadata.vtAnalysis?.vtLinks?.[idx] && (
+                              {getMetadataProperty(alert.metadata, 'vtAnalysis')?.vtLinks?.[idx] && (
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="ml-2"
-                                  onClick={() => window.open(alert.metadata.vtAnalysis.vtLinks[idx], '_blank')}
+                                  className="ml-2 flex-shrink-0"
+                                  onClick={() => window.open(getMetadataProperty(alert.metadata, 'vtAnalysis').vtLinks[idx], '_blank')}
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />
                                   VT Analysis
@@ -532,14 +565,14 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                       </div>
                     )}
 
-                    {alert.metadata.suspiciousIPs && (
+                    {alert.metadata.suspiciousIPs && Array.isArray(alert.metadata.suspiciousIPs) && (
                       <div>
                         <h4 className="font-semibold mb-2">Suspicious IP Addresses</h4>
-                        <div className="space-y-2">
+                        <div className="space-y-2 max-h-64 overflow-y-auto">
                           {alert.metadata.suspiciousIPs.map((ip: string, idx: number) => (
                             <div key={idx} className="flex items-center justify-between bg-orange-50 dark:bg-orange-950/20 p-3 rounded border-l-4 border-orange-500">
                               <div className="flex items-center space-x-3">
-                                <code className="text-sm">{ip}</code>
+                                <code className="text-sm break-all">{ip}</code>
                                 <Badge variant="outline" className="text-xs">Suspicious IP</Badge>
                               </div>
                             </div>
@@ -553,8 +586,9 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
 
               <TabsContent value="mitre-attack" className="space-y-4">
                 <div className="bg-purple-50 dark:bg-purple-950/20 p-3 rounded-lg border-l-4 border-purple-500 mb-4">
-                  <p className="text-sm text-purple-800 dark:text-purple-200">
-                    <strong>🎯 Official MITRE Mapping:</strong> Real techniques and tactics from the official MITRE ATT&CK framework with direct links
+                  <p className="text-sm text-purple-800 dark:text-purple-200 break-words">
+                    <strong className="font-semibold">🎯 Official MITRE Mapping:</strong>{" "}
+                    <span className="inline-block">Real techniques and tactics from the official MITRE ATT&CK framework with direct links</span>
                   </p>
                 </div>
                 <Card>
