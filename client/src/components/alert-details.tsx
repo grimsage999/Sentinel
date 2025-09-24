@@ -427,26 +427,26 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
             </div>
             
             <Tabs defaultValue="email-details" className="w-full">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="email-details" className="flex flex-col items-center p-3">
-                  <Mail className="w-4 h-4 mb-1" />
-                  <span className="text-xs">Email Details</span>
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5 gap-1">
+                <TabsTrigger value="email-details" className="flex flex-col items-center p-2 min-w-0">
+                  <Mail className="w-4 h-4 mb-1 flex-shrink-0" />
+                  <span className="text-xs text-center leading-tight">Email</span>
                 </TabsTrigger>
-                <TabsTrigger value="iocs" className="flex flex-col items-center p-3">
-                  <Database className="w-4 h-4 mb-1" />
-                  <span className="text-xs">IOCs & VT</span>
+                <TabsTrigger value="iocs" className="flex flex-col items-center p-2 min-w-0">
+                  <Database className="w-4 h-4 mb-1 flex-shrink-0" />
+                  <span className="text-xs text-center leading-tight">IOCs</span>
                 </TabsTrigger>
-                <TabsTrigger value="mitre-attack" className="flex flex-col items-center p-3">
-                  <Target className="w-4 h-4 mb-1" />
-                  <span className="text-xs">MITRE ATT&CK</span>
+                <TabsTrigger value="mitre-attack" className="flex flex-col items-center p-2 min-w-0">
+                  <Target className="w-4 h-4 mb-1 flex-shrink-0" />
+                  <span className="text-xs text-center leading-tight">MITRE</span>
                 </TabsTrigger>
-                <TabsTrigger value="techniques" className="flex flex-col items-center p-3">
-                  <Eye className="w-4 h-4 mb-1" />
-                  <span className="text-xs">Attack Methods</span>
+                <TabsTrigger value="techniques" className="flex flex-col items-center p-2 min-w-0">
+                  <Eye className="w-4 h-4 mb-1 flex-shrink-0" />
+                  <span className="text-xs text-center leading-tight">Methods</span>
                 </TabsTrigger>
-                <TabsTrigger value="risk-factors" className="flex flex-col items-center p-3">
-                  <AlertTriangle className="w-4 h-4 mb-1" />
-                  <span className="text-xs">Risk Factors</span>
+                <TabsTrigger value="risk-factors" className="flex flex-col items-center p-2 min-w-0">
+                  <AlertTriangle className="w-4 h-4 mb-1 flex-shrink-0" />
+                  <span className="text-xs text-center leading-tight">Risks</span>
                 </TabsTrigger>
               </TabsList>
               
@@ -523,17 +523,17 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {getMetadataProperty(alert.metadata, 'vtAnalysis') && (
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-                        <div className="bg-card p-3 rounded-lg border">
-                          <p className="text-xs text-muted-foreground">Malicious URLs</p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="bg-card p-3 rounded-lg border min-w-0">
+                          <p className="text-xs text-muted-foreground whitespace-nowrap">Malicious URLs</p>
                           <p className="text-xl font-bold text-red-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.maliciousUrls || 0}</p>
                         </div>
-                        <div className="bg-card p-3 rounded-lg border">
-                          <p className="text-xs text-muted-foreground">Suspicious Score</p>
+                        <div className="bg-card p-3 rounded-lg border min-w-0">
+                          <p className="text-xs text-muted-foreground whitespace-nowrap">Suspicious Score</p>
                           <p className="text-xl font-bold text-orange-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.suspiciousScore || 0}%</p>
                         </div>
-                        <div className="bg-card p-3 rounded-lg border">
-                          <p className="text-xs text-muted-foreground">VT Reports</p>
+                        <div className="bg-card p-3 rounded-lg border min-w-0">
+                          <p className="text-xs text-muted-foreground whitespace-nowrap">VT Reports</p>
                           <p className="text-xl font-bold text-blue-500">{getMetadataProperty(alert.metadata, 'vtAnalysis')?.vtLinks?.length || 0}</p>
                         </div>
                       </div>
