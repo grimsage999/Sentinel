@@ -495,7 +495,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                           {alert.metadata.attachments.map((attachment: string, idx: number) => (
                             <div key={idx} className="flex items-center space-x-2 bg-red-50 dark:bg-red-950/20 p-2 rounded">
                               <AlertTriangle className="w-4 h-4 text-red-500" />
-                              <span className="font-mono text-sm">{attachment}</span>
+                              <span className="font-mono text-sm text-red-900 dark:text-red-100">{attachment}</span>
                               <Badge variant="destructive" className="text-xs">Malicious</Badge>
                             </div>
                           ))}
@@ -547,7 +547,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                           {alert.metadata.maliciousUrls.map((url: string, idx: number) => (
                             <div key={idx} className="flex items-center justify-between bg-red-50 dark:bg-red-950/20 p-3 rounded border-l-4 border-red-500 gap-2">
                               <div className="flex-1 min-w-0">
-                                <p className="font-mono text-sm break-all">{url}</p>
+                                <p className="font-mono text-sm break-all text-red-900 dark:text-red-100">{url}</p>
                               </div>
                               {getMetadataProperty(alert.metadata, 'vtAnalysis')?.vtLinks?.[idx] && (
                                 <Button
@@ -573,7 +573,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                           {alert.metadata.suspiciousIPs.map((ip: string, idx: number) => (
                             <div key={idx} className="flex items-center justify-between bg-orange-50 dark:bg-orange-950/20 p-3 rounded border-l-4 border-orange-500">
                               <div className="flex items-center space-x-3">
-                                <code className="text-sm break-all">{ip}</code>
+                                <code className="text-sm break-all text-orange-900 dark:text-orange-100">{ip}</code>
                                 <Badge variant="outline" className="text-xs">Suspicious IP</Badge>
                               </div>
                             </div>
@@ -683,8 +683,8 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                           <div key={idx} className="flex items-center space-x-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border-l-4 border-amber-500">
                             <AlertTriangle className="w-5 h-5 text-amber-600" />
                             <div>
-                              <p className="font-medium text-sm">{technique}</p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="font-medium text-sm text-amber-900 dark:text-amber-100">{technique}</p>
+                              <p className="text-xs text-amber-700 dark:text-amber-200">
                                 {technique === "Urgency Tactics" ? "Creates false sense of urgency to pressure victims" :
                                  technique === "Brand Impersonation" ? "Mimics trusted brands to gain credibility" :
                                  technique === "Account Suspension Threat" ? "Threatens account closure to prompt action" :
@@ -727,7 +727,7 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                           <div key={idx} className="flex items-start space-x-3 p-3 bg-red-50 dark:bg-red-950/20 rounded-lg border-l-4 border-red-500">
                             <AlertTriangle className="w-4 h-4 text-red-600 mt-0.5" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium">{factor}</p>
+                              <p className="text-sm font-medium text-red-900 dark:text-red-100">{factor}</p>
                               <div className="mt-1">
                                 <Badge variant="destructive" className="text-xs">High Risk</Badge>
                               </div>
