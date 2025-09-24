@@ -29,6 +29,10 @@ localPort = 42807
 externalPort = 3000
 
 [[ports]]
+localPort = 45403
+externalPort = 4200
+
+[[ports]]
 localPort = 46847
 externalPort = 3002
 
@@ -58,6 +62,7 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_database:1.0.0", "javascript_sendgrid:1.0.0"]
+expertMode = true
 
 [objectStorage]
 defaultBucketID = "replit-objstore-244e970a-8962-49d4-9f22-99268aa10a65"
