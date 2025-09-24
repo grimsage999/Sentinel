@@ -1,0 +1,146 @@
+UI Text Visibility and Color Contrast Audit
+Primary Objective
+Conduct a comprehensive audit to identify and fix text visibility issues without modifying core application functionality or layout structure.
+Critical Focus: Text Visibility Issues
+1. White Text on Light Backgrounds Audit
+Search systematically for:
+
+White text (#ffffff, #fff, white) on white/light backgrounds
+Light gray text on similar colored backgrounds
+Text elements with insufficient color contrast (below WCAG standards)
+Invisible or barely visible text due to color matching
+
+2. Comprehensive Text Element Review
+Examine ALL text elements including:
+
+Navigation menu items and dropdown text
+Button labels and call-to-action text
+Form labels and placeholder text
+Table headers and data cells
+Modal dialog content and buttons
+Tooltip text and hover states
+Status messages (success, error, warning)
+Tab labels and panel content
+Card titles and descriptions
+Footer links and copyright text
+
+3. Background-Specific Checks
+Test text visibility against:
+
+Dark themed sections - ensure light text is visible
+Light themed sections - ensure dark text is visible
+Colored backgrounds (blue, gray, etc.) - verify contrast ratios
+Image backgrounds - check text overlay visibility
+Gradient backgrounds - ensure text remains visible across color transitions
+
+Technical Implementation Guidelines
+Color Contrast Requirements
+
+Minimum contrast ratio: 4.5:1 for normal text
+Large text contrast ratio: 3:1 for text 18px+ or bold 14px+
+Interactive elements: Maintain contrast in all states (normal, hover, focus, active)
+
+Safe Color Combinations
+For Dark Backgrounds:
+
+Use white (#ffffff) or very light colors (#f0f0f0+)
+Avoid light grays that blend with dark backgrounds
+
+For Light Backgrounds:
+
+Use dark colors (#333333 or darker)
+Avoid medium grays that lack sufficient contrast
+
+CSS-Only Fixes (No Functionality Changes)
+css/* Example approaches - DO NOT copy exactly, adapt to existing styles */
+.problematic-text {
+    color: #ffffff; /* If on dark background */
+    color: #333333; /* If on light background */
+}
+
+/* Ensure proper contrast inheritance */
+.parent-container .child-text {
+    color: inherit; /* Only if parent has proper contrast */
+}
+Systematic Audit Process
+Phase 1: Visual Scan
+
+Navigate through every page/section of the application
+Test different theme modes (if applicable - dark/light themes)
+Check all interactive states (hover, focus, active, disabled)
+Verify responsive breakpoints - text visibility at different screen sizes
+Document problematic areas with screenshots and CSS selectors
+
+Phase 2: Code Review
+
+Search CSS files for color properties that might cause visibility issues
+Identify inherited color conflicts where parent styles override child visibility
+Check for dynamically applied classes that might affect text color
+Review CSS variables and color scheme definitions
+
+Phase 3: Testing and Validation
+
+Use browser developer tools to inspect text elements
+Test with contrast checking tools (browser extensions or online tools)
+Verify fixes across different browsers and operating systems
+Ensure functionality remains unchanged after color adjustments
+
+Strict Constraints
+DO NOT MODIFY
+
+Application logic or JavaScript functionality
+Layout positioning or element placement
+Component structure or HTML hierarchy
+Database connections or API integrations
+User workflows or navigation paths
+Feature availability or access controls
+
+ONLY MODIFY
+
+CSS color properties for text elements
+CSS color properties for backgrounds where necessary for contrast
+CSS inheritance to ensure proper color cascading
+CSS specificity to override problematic color rules
+
+Quality Assurance Checklist
+Before Making Changes
+
+ Document current state with screenshots
+ Identify specific CSS selectors causing issues
+ Test functionality in problematic areas
+ Note any custom color schemes or themes
+
+During Implementation
+
+ Make minimal, targeted color changes only
+ Test each change immediately for functionality impact
+ Ensure changes work across all browsers
+ Verify responsive design isn't broken
+
+After Implementation
+
+ All text is clearly visible and readable
+ Color contrast meets accessibility standards
+ No functionality has been altered or broken
+ All interactive elements maintain proper visibility
+ Application performs identically to before changes
+
+Reporting Requirements
+Issue Documentation
+For each visibility problem found:
+
+Location: Specific page/section and CSS selector
+Problem: Description of visibility issue
+Current colors: Background and text color values
+Proposed fix: New color values with contrast ratio
+Impact assessment: Any potential side effects
+
+Success Confirmation
+
+ Complete visual audit shows no remaining visibility issues
+ All text meets minimum contrast requirements
+ Application functionality verified unchanged
+ Cross-browser testing completed successfully
+
+
+Critical Reminder: This is purely a visual/accessibility fix. If ANY functionality appears altered during testing, immediately revert changes and reassess the approach. The goal is 100% visual improvement with 0% functional impact.
