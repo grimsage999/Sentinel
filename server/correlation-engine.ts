@@ -423,7 +423,7 @@ export class CorrelationEngine {
     // Look for alerts that escalated in severity within the last 24 hours
     const last24Hours = new Date(alert.timestamp.getTime() - CorrelationEngine.TIME_WINDOWS.LONG);
     
-    const escalationAlerts = await db
+    const escalationAlerts = await db()
       .select()
       .from(alerts)
       .where(
