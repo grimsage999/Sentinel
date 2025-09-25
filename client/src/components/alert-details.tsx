@@ -554,7 +554,15 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                                   variant="outline"
                                   size="sm"
                                   className="ml-2 flex-shrink-0"
-                                  onClick={() => window.open(getMetadataProperty(alert.metadata, 'vtAnalysis').vtLinks[idx], '_blank')}
+                                  onClick={() => {
+                                    const link = document.createElement('a');
+                                    link.href = getMetadataProperty(alert.metadata, 'vtAnalysis').vtLinks[idx];
+                                    link.target = '_blank';
+                                    link.rel = 'noopener noreferrer';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  }}
                                 >
                                   <ExternalLink className="w-3 h-3 mr-1" />
                                   VT Analysis
@@ -633,7 +641,15 @@ export default function AlertDetails({ alert, onIOCEnrichment }: AlertDetailsPro
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => window.open(`https://attack.mitre.org/techniques/${technique}`, '_blank')}
+                                onClick={() => {
+                                  const link = document.createElement('a');
+                                  link.href = `https://attack.mitre.org/techniques/${technique}`;
+                                  link.target = '_blank';
+                                  link.rel = 'noopener noreferrer';
+                                  document.body.appendChild(link);
+                                  link.click();
+                                  document.body.removeChild(link);
+                                }}
                               >
                                 <ExternalLink className="w-3 h-3" />
                               </Button>
