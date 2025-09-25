@@ -395,3 +395,81 @@ class ThreatIntelService:
             return []
         finally:
             conn.close()
+            
+    async def enrich_iocs_with_threat_intelligence(self, iocs):
+        """
+        Enrich IOCs with available threat intelligence data.
+        
+        Args:
+            iocs: IOCCollection object with IOCs to enrich
+            
+        Returns:
+            Enriched IOCCollection with threat intelligence data attached
+        """
+        try:
+            from ...models.analysis_models import IOCCollection, IOCItem
+            
+            # Create a new IOC collection for enriched results
+            enriched_urls = []
+            enriched_domains = []  
+            enriched_ips = []
+            
+            # Enrich URLs
+            for url_ioc in iocs.urls:
+                threat_intel = await self.check_ioc_threat_intelligence(url_ioc.value)
+                
+                # Create new IOCItem with threat intelligence fields included
+                enriched_url = IOCItem(
+                    value=url_ioc.value,
+                    type=url_ioc.type,
+                    vtLink=url_ioc.vt_link,
+                    context=url_ioc.context,
+                    has_threat_intelligence=bool(threat_intel),
+                    threat_intelligence=threat_intel
+                )
+                    
+                enriched_urls.append(enriched_url)
+                
+            # Enrich Domains
+            for domain_ioc in iocs.domains:
+                threat_intel = await self.check_ioc_threat_intelligence(domain_ioc.value)
+                
+                # Create new IOCItem with threat intelligence fields included
+                enriched_domain = IOCItem(
+                    value=domain_ioc.value,
+                    type=domain_ioc.type,
+                    vtLink=domain_ioc.vt_link,
+                    context=domain_ioc.context,
+                    has_threat_intelligence=bool(threat_intel),
+                    threat_intelligence=threat_intel
+                )
+                    
+                enriched_domains.append(enriched_domain)
+                
+            # Enrich IPs
+            for ip_ioc in iocs.ips:
+                threat_intel = await self.check_ioc_threat_intelligence(ip_ioc.value)
+                
+                # Create new IOCItem with threat intelligence fields included
+                enriched_ip = IOCItem(
+                    value=ip_ioc.value,
+                    type=ip_ioc.type,
+                    vtLink=ip_ioc.vt_link,
+                    context=ip_ioc.context,
+                    has_threat_intelligence=bool(threat_intel),
+                    threat_intelligence=threat_intel
+                )
+                    
+                enriched_ips.append(enriched_ip)
+                
+            # Return enriched IOC collection
+            return IOCCollection(
+                urls=enriched_urls,
+                domains=enriched_domains, 
+                ips=enriched_ips
+            )
+            
+        except Exception as e:
+            logger.error(f"Error enriching IOCs with threat intelligence: {str(e)}")
+            # Return original IOCs on error
+            return iocs

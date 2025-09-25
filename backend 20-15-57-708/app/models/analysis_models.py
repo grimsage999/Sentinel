@@ -74,6 +74,9 @@ class IOCItem(BaseModel):
     type: IOCType
     vt_link: str = Field(..., alias="vtLink")
     context: Optional[str] = Field(default=None, max_length=200)
+    # Threat intelligence enhancement fields
+    has_threat_intelligence: bool = Field(default=False)
+    threat_intelligence: Optional[Dict[str, Any]] = Field(default=None)
 
     class Config:
         populate_by_name = True

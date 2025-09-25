@@ -35,6 +35,7 @@ from ..models.analysis_models import (
 )
 from .prompt_builder import PromptBuilder
 from .cache_service import analysis_cache
+from .threat_intelligence import ThreatIntelService
 from ..utils.logging import get_secure_logger, extract_safe_email_metadata
 
 
@@ -55,6 +56,7 @@ class LLMAnalyzer:
     
     def __init__(self):
         self.prompt_builder = PromptBuilder()
+        self.threat_intel_service = ThreatIntelService()
         self.openai_client = None
         self.anthropic_client = None
         self.google_client = None
@@ -154,8 +156,32 @@ class LLMAnalyzer:
             client_ip="internal"  # This will be updated by the API layer
         )
         
-        # Build optimized analysis prompt
-        prompt = self.prompt_builder.build_analysis_prompt(email_content, email_headers)
+        # Enrich IOCs with threat intelligence if available  
+        enriched_iocs = iocs
+        threat_intelligence_context = ""
+        
+        if iocs:
+            try:
+                logger.debug(f"Enriching {len(iocs.urls) + len(iocs.ips) + len(iocs.domains)} IOCs with threat intelligence")
+                enriched_iocs = await self.threat_intel_service.enrich_iocs_with_threat_intelligence(iocs)
+                
+                # Generate threat intelligence context for the prompt
+                threat_intelligence_context = await self._generate_threat_intelligence_context(enriched_iocs)
+                
+                if threat_intelligence_context:
+                    logger.debug(f"Added threat intelligence context ({len(threat_intelligence_context)} characters)")
+                    
+            except Exception as e:
+                logger.warning(f"Failed to enrich IOCs with threat intelligence: {str(e)}")
+                # Continue with original IOCs if enrichment fails
+                enriched_iocs = iocs
+
+        # Build optimized analysis prompt with threat intelligence context
+        prompt = self.prompt_builder.build_analysis_prompt(
+            email_content, 
+            email_headers,
+            threat_intelligence_context=threat_intelligence_context
+        )
         
         # Try primary provider first, then fallback
         providers_to_try = self._get_provider_order()
@@ -184,7 +210,7 @@ class LLMAnalyzer:
                 analysis_result = self._parse_llm_response_optimized(
                     llm_response, 
                     start_time, 
-                    iocs or IOCCollection()
+                    enriched_iocs or IOCCollection()
                 )
                 
                 # Enhance with MITRE ATT&CK context
@@ -774,3 +800,84 @@ class LLMAnalyzer:
             processing_time=processing_time,
             timestamp=datetime.now(timezone.utc)
         )
+        
+    async def _generate_threat_intelligence_context(self, enriched_iocs: IOCCollection) -> str:
+        """
+        Generate threat intelligence context string for prompt enhancement.
+        
+        Args:
+            enriched_iocs: IOCs enriched with threat intelligence data
+            
+        Returns:
+            Formatted threat intelligence context string
+        """
+        if not enriched_iocs:
+            return ""
+            
+        context_parts = []
+        
+        # Collect threat intelligence findings from enriched IOCs
+        threat_intel_findings = []
+        
+        # Check URLs for threat intelligence
+        for url in enriched_iocs.urls:
+            if url.has_threat_intelligence and url.threat_intelligence:
+                threat_intel = url.threat_intelligence
+                threat_intel_findings.append({
+                    'ioc_type': 'URL',
+                    'ioc_value': url.value,
+                    'threat_level': threat_intel.get('threat_level', 'UNKNOWN'),
+                    'confidence_score': threat_intel.get('confidence_score', 0),
+                    'source': threat_intel.get('source', 'Unknown'),
+                    'context': threat_intel.get('context', '')
+                })
+        
+        # Check domains for threat intelligence
+        for domain in enriched_iocs.domains:
+            if domain.has_threat_intelligence and domain.threat_intelligence:
+                threat_intel = domain.threat_intelligence
+                threat_intel_findings.append({
+                    'ioc_type': 'Domain',
+                    'ioc_value': domain.value,
+                    'threat_level': threat_intel.get('threat_level', 'UNKNOWN'),
+                    'confidence_score': threat_intel.get('confidence_score', 0),
+                    'source': threat_intel.get('source', 'Unknown'),
+                    'context': threat_intel.get('context', '')
+                })
+                
+        # Check IPs for threat intelligence
+        for ip in enriched_iocs.ips:
+            if ip.has_threat_intelligence and ip.threat_intelligence:
+                threat_intel = ip.threat_intelligence
+                threat_intel_findings.append({
+                    'ioc_type': 'IP Address',
+                    'ioc_value': ip.value,
+                    'threat_level': threat_intel.get('threat_level', 'UNKNOWN'),
+                    'confidence_score': threat_intel.get('confidence_score', 0),
+                    'source': threat_intel.get('source', 'Unknown'),
+                    'context': threat_intel.get('context', '')
+                })
+        
+        if not threat_intel_findings:
+            return ""
+            
+        # Build context string
+        context_parts.append("THREAT INTELLIGENCE CONTEXT:")
+        context_parts.append(f"Found {len(threat_intel_findings)} indicators with threat intelligence:")
+        
+        for finding in threat_intel_findings:
+            context_parts.append(
+                f"- {finding['ioc_type']}: {finding['ioc_value']} "
+                f"({finding['threat_level']} threat level, "
+                f"{finding['confidence_score']}% confidence, "
+                f"source: {finding['source']})"
+            )
+            
+            if finding['context'] and len(finding['context']) > 20:
+                # Add snippet of context
+                context_snippet = finding['context'][:100] + "..." if len(finding['context']) > 100 else finding['context']
+                context_parts.append(f"  Context: {context_snippet}")
+        
+        context_parts.append("")  # Add blank line before analysis
+        
+        return "\n".join(context_parts)

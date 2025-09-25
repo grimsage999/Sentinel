@@ -21,13 +21,14 @@ class PromptBuilder:
         self.json_schema = self._build_json_schema()
         self.mitre_service = MitreAttackService()
     
-    def build_analysis_prompt(self, email_content: str, email_headers: Dict[str, Any] = None) -> str:
+    def build_analysis_prompt(self, email_content: str, email_headers: Dict[str, Any] = None, threat_intelligence_context: str = "") -> str:
         """
-        Build optimized analysis prompt for faster processing
+        Build optimized analysis prompt for faster processing with threat intelligence context
         
         Args:
             email_content: Raw email content to analyze
             email_headers: Parsed email headers (optional)
+            threat_intelligence_context: Additional threat intelligence context (optional)
             
         Returns:
             Optimized prompt string for LLM analysis
@@ -40,10 +41,17 @@ class PromptBuilder:
         if email_headers:
             header_context = self._build_minimal_header_context(email_headers)
         
-        # Build streamlined prompt for faster processing
+        # Build streamlined prompt for faster processing with threat intelligence if available
+        threat_intel_section = ""
+        if threat_intelligence_context:
+            threat_intel_section = f"""
+
+{threat_intelligence_context}
+Consider this threat intelligence when analyzing the email. If any IOCs match known threats, increase risk assessment accordingly."""
+
         prompt = f"""Analyze this email for phishing. Respond with JSON only:
 
-{optimized_content}{header_context}
+{optimized_content}{header_context}{threat_intel_section}
 
 Required JSON format:
 {self._get_compact_schema()}"""
