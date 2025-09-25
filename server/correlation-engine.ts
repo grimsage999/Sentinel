@@ -46,7 +46,7 @@ export class CorrelationEngine {
    * Analyze correlations for a specific alert
    */
   async analyzeAlert(alertId: string): Promise<CorrelationAnalysis> {
-    const alert = await db.select().from(alerts).where(eq(alerts.id, alertId)).limit(1);
+    const alert = await db().select().from(alerts).where(eq(alerts.id, alertId)).limit(1);
     if (!alert.length) {
       throw new Error(`Alert ${alertId} not found`);
     }
@@ -109,13 +109,13 @@ export class CorrelationEngine {
    */
   private async findIOCOverlapCorrelations(alert: Alert): Promise<CorrelationResult[]> {
     // Get IOCs for this alert
-    const alertIOCs = await db.select().from(iocs).where(eq(iocs.alertId, alert.id));
+    const alertIOCs = await db().select().from(iocs).where(eq(iocs.alertId, alert.id));
     if (!alertIOCs.length) return [];
 
     const iocValues = alertIOCs.map(ioc => ioc.value);
 
     // Find other alerts with shared IOCs
-    const sharedIOCAlerts = await db
+    const sharedIOCAlerts = await db()
       .select({
         alertId: iocs.alertId,
         alert: alerts,
@@ -194,7 +194,7 @@ export class CorrelationEngine {
       const startTime = new Date(alertTime.getTime() - windowMs);
       const endTime = new Date(alertTime.getTime() + windowMs);
 
-      const proximateAlerts = await db
+      const proximateAlerts = await db()
         .select()
         .from(alerts)
         .where(
@@ -249,7 +249,7 @@ export class CorrelationEngine {
    * Find correlations based on source similarity
    */
   private async findSourceSimilarityCorrelations(alert: Alert): Promise<CorrelationResult[]> {
-    const sameSourceAlerts = await db
+    const sameSourceAlerts = await db()
       .select()
       .from(alerts)
       .where(
@@ -306,7 +306,7 @@ export class CorrelationEngine {
    * Find correlations based on threat actor attribution
    */
   private async findThreatActorCorrelations(alert: Alert): Promise<CorrelationResult[]> {
-    const threatIntel = await db
+    const threatIntel = await db()
       .select()
       .from(threatIntelligence)
       .where(eq(threatIntelligence.alertId, alert.id))
@@ -316,7 +316,7 @@ export class CorrelationEngine {
 
     const threatActor = threatIntel[0].threatActor;
     
-    const relatedThreatIntel = await db
+    const relatedThreatIntel = await db()
       .select({
         threatIntel: threatIntelligence,
         alert: alerts
@@ -360,7 +360,7 @@ export class CorrelationEngine {
    * Find correlations based on campaign attribution
    */
   private async findCampaignCorrelations(alert: Alert): Promise<CorrelationResult[]> {
-    const threatIntel = await db
+    const threatIntel = await db()
       .select()
       .from(threatIntelligence)  
       .where(eq(threatIntelligence.alertId, alert.id))
@@ -373,7 +373,7 @@ export class CorrelationEngine {
     
     if (!campaign) return [];
 
-    const relatedCampaignIntel = await db
+    const relatedCampaignIntel = await db()
       .select({
         threatIntel: threatIntelligence,
         alert: alerts
@@ -600,7 +600,7 @@ export class CorrelationEngine {
     }));
 
     if (insertData.length > 0) {
-      await db.insert(correlations).values(insertData).onConflictDoNothing();
+      await db().insert(correlations).values(insertData).onConflictDoNothing();
     }
   }
 

@@ -26,6 +26,11 @@ class Settings(BaseSettings):
     # VirusTotal Configuration
     virustotal_api_key: Optional[str] = Field(default=None, env="VIRUSTOTAL_API_KEY")
     
+    # MITRE ATT&CK Configuration
+    mitre_attack_api_url: str = Field(default="https://raw.githubusercontent.com/mitre/cti/master/enterprise-attack/enterprise-attack.json", env="MITRE_ATTACK_API_URL")
+    mitre_attack_cache_ttl_hours: int = Field(default=24, env="MITRE_ATTACK_CACHE_TTL_HOURS")
+    mitre_attack_enabled: bool = Field(default=True, env="MITRE_ATTACK_ENABLED")
+    
     # Security Configuration
     cors_origins: List[str] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"],
