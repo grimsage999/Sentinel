@@ -68,6 +68,28 @@ class Settings(BaseSettings):
     cache_ttl_hours: int = Field(default=24, env="CACHE_TTL_HOURS")
     enable_response_caching: bool = Field(default=True, env="ENABLE_RESPONSE_CACHING")
     
+    # Threat Intelligence Configuration
+    threat_intel_enabled: bool = Field(default=True, env="THREAT_INTEL_ENABLED")
+    threat_intel_db_path: str = Field(default="threat_intel.db", env="THREAT_INTEL_DB_PATH")
+    threat_intel_harvest_interval_hours: int = Field(default=6, env="THREAT_INTEL_HARVEST_INTERVAL_HOURS")
+    threat_intel_cleanup_days: int = Field(default=30, env="THREAT_INTEL_CLEANUP_DAYS")
+    threat_intel_min_credibility: int = Field(default=70, env="THREAT_INTEL_MIN_CREDIBILITY")
+    threat_intel_sources: List[str] = Field(
+        default=[
+            "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+            "https://isc.sans.edu/rssfeed.xml",
+            "https://blog.malwarebytes.com/feed/",
+            "https://krebsonsecurity.com/feed/"
+        ],
+        env="THREAT_INTEL_SOURCES"
+    )
+    
+    # Threat Intelligence Processing Configuration
+    threat_intel_max_entries_per_harvest: int = Field(default=10, env="THREAT_INTEL_MAX_ENTRIES_PER_HARVEST")
+    threat_intel_context_length: int = Field(default=100, env="THREAT_INTEL_CONTEXT_LENGTH")
+    threat_intel_min_confidence: int = Field(default=75, env="THREAT_INTEL_MIN_CONFIDENCE")
+    threat_intel_cache_hours: int = Field(default=1, env="THREAT_INTEL_CACHE_HOURS")
+    
     class Config:
         env_file = ".env"
         case_sensitive = False

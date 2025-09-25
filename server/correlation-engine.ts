@@ -472,7 +472,7 @@ export class CorrelationEngine {
   private async findAssetTargetingCorrelations(alert: Alert): Promise<CorrelationResult[]> {
     if (!alert.affectedAssets) return [];
 
-    const assetTargetingAlerts = await db
+    const assetTargetingAlerts = await db()
       .select()
       .from(alerts)
       .where(

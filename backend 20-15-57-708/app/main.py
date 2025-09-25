@@ -82,6 +82,52 @@ async def lifespan(app: FastAPI):
     await analysis_cache.start_background_cleanup()
     logger.info("Cache background cleanup started")
     
+    # Start threat intelligence services
+    if settings.threat_intel_enabled:
+        from .services.threat_intelligence import ThreatIntelligenceHarvester, ThreatIntelligenceProcessor
+        
+        # Initialize harvester and processor
+        app.state.threat_harvester = ThreatIntelligenceHarvester(
+            db_path=settings.threat_intel_db_path,
+            sources=None  # Uses default sources from harvester
+        )
+        app.state.threat_processor = ThreatIntelligenceProcessor(
+            db_path=settings.threat_intel_db_path
+        )
+        
+        # Start background threat intelligence harvesting
+        async def threat_intel_background_task():
+            """Background task for threat intelligence harvesting and processing"""
+            import asyncio
+            while True:
+                try:
+                    logger.info("Starting threat intelligence harvest cycle")
+                    
+                    # Harvest new threat intelligence
+                    harvest_results = await app.state.threat_harvester.harvest_all_sources()
+                    logger.info(f"Harvest completed: {harvest_results['entries_new']} new entries")
+                    
+                    # Process unprocessed entries to extract IOCs
+                    if harvest_results['entries_new'] > 0:
+                        process_results = await app.state.threat_processor.process_all_unprocessed()
+                        logger.info(f"IOC processing completed: {process_results['iocs_extracted']} IOCs extracted")
+                    
+                    # Cleanup old entries
+                    await app.state.threat_harvester.cleanup_old_entries(settings.threat_intel_cleanup_days)
+                    
+                    # Wait for next harvest cycle
+                    await asyncio.sleep(settings.threat_intel_harvest_interval_hours * 3600)
+                    
+                except Exception as e:
+                    logger.error(f"Error in threat intelligence background task: {str(e)}")
+                    # Wait a bit before retrying on error
+                    await asyncio.sleep(300)  # 5 minutes
+                    
+        # Start the background task
+        import asyncio
+        app.state.threat_intel_task = asyncio.create_task(threat_intel_background_task())
+        logger.info(f"Threat intelligence background task started (harvest interval: {settings.threat_intel_harvest_interval_hours} hours)")
+        
     # VirusTotal background submission service (disabled for now)
     # from .services.background_vt_service import background_vt_service
     # await background_vt_service.start()
@@ -103,6 +149,20 @@ async def lifespan(app: FastAPI):
     
     # Stop performance monitoring
     await performance_monitor.stop_background_monitoring()
+    
+    # Stop threat intelligence background task
+    if settings.threat_intel_enabled and hasattr(app.state, 'threat_intel_task'):
+        app.state.threat_intel_task.cancel()
+        try:
+            await app.state.threat_intel_task
+        except asyncio.CancelledError:
+            pass
+        
+        # Close harvester resources
+        if hasattr(app.state, 'threat_harvester'):
+            await app.state.threat_harvester.close()
+            
+        logger.info("Threat intelligence background task stopped")
     
     # Stop VirusTotal background service (disabled for now)
     # await background_vt_service.stop()
