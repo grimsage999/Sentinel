@@ -472,15 +472,28 @@ export class CorrelationEngine {
   private async findAssetTargetingCorrelations(alert: Alert): Promise<CorrelationResult[]> {
     if (!alert.affectedAssets) return [];
 
-    const assetTargetingAlerts = await db()
-      .select()
-      .from(alerts)
-      .where(
-        and(
-          ne(alerts.id, alert.id),
-          isNotNull(alerts.affectedAssets)
-        )
-      );
+    let assetTargetingAlerts: Alert[] = [];
+    
+    try {
+      const database = db();
+      if (!database || typeof database.select !== 'function') {
+        console.error('Database connection not available for asset targeting correlations');
+        return [];
+      }
+
+      assetTargetingAlerts = await database
+        .select()
+        .from(alerts)
+        .where(
+          and(
+            ne(alerts.id, alert.id),
+            isNotNull(alerts.affectedAssets)
+          )
+        );
+    } catch (error) {
+      console.error('Failed to query asset targeting correlations:', error);
+      return [];
+    }
 
     const correlations: CorrelationResult[] = [];
     for (const relatedAlert of assetTargetingAlerts) {
