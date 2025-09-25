@@ -675,7 +675,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`✅ Email analysis completed with risk level: ${result.analysis?.risk_score?.risk_level}`);
 
       // Create an audit log entry for the analysis
-      await storage.createAuditLog({
+      await storage.createAuditEntry({
         actor: "USER",
         action: "Email analysis performed",
         metadata: { 
@@ -807,7 +807,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resource: "incident",
         resourceId: incidentData.id
       };
-      await storage.createAuditLog(auditEntry);
+      await storage.createAuditEntry(auditEntry);
       
       res.status(201).json(incidentData);
     } catch (error) {
@@ -838,7 +838,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         resource: shareData.type,
         resourceId: shareData.resourceId
       };
-      await storage.createAuditLog(auditEntry);
+      await storage.createAuditEntry(auditEntry);
 
       res.status(201).json({ success: true, shareData });
     } catch (error) {
@@ -905,7 +905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: `Exported ${exportType} data in ${format} format`,
         resource: "export"
       };
-      await storage.createAuditLog(auditEntry);
+      await storage.createAuditEntry(auditEntry);
 
       if (format === "csv" && exportType === "alerts") {
         // Convert alerts to CSV
