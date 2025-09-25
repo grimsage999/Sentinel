@@ -1,0 +1,162 @@
+VirusTotal API Integration and External Link Functionality
+Primary Objective
+Ensure VirusTotal API integration works properly and all external links/buttons in the application redirect to their correct destinations.
+Core Functionality Requirements
+VirusTotal API Integration
+Expected Behavior:
+
+Scan functionality should trigger actual VirusTotal API calls
+Results display should show real scan data from VirusTotal
+API responses should be properly parsed and displayed in the interface
+Error handling for API failures or rate limits should be implemented
+
+Testing Requirements:
+
+Verify API key configuration is properly set and active
+Test scan submission with sample files/URLs
+Confirm result retrieval shows actual VirusTotal data
+Check response formatting matches application display expectations
+Validate error handling for failed API calls or invalid inputs
+
+External Link Validation and Correction
+MITRE ATT&CK Framework Links:
+
+Attack technique references should link to corresponding MITRE ATT&CK pages
+Tactic classifications should direct to proper MITRE documentation
+Technique IDs (e.g., T1566.001) should link to specific technique pages
+Expected URL format: https://attack.mitre.org/techniques/[TECHNIQUE_ID]/
+
+Security Resource Links:
+
+Threat intelligence sources should link to actual threat databases
+Security advisories should direct to official vendor pages
+CVE references should link to NIST CVE database or MITRE CVE pages
+Research papers should link to original publications or repositories
+
+Documentation and Help Links:
+
+User guide and help documentation links
+API documentation references
+Support contact information and ticketing systems
+Privacy policy and terms of service pages
+
+Systematic Link Audit Process
+Phase 1: Identify All External Links
+Search for and catalog:
+
+Buttons with external destinations (href attributes pointing outside domain)
+Text links embedded in content or tooltips
+Navigation menu items that should redirect externally
+Reference citations and source attributions
+Logo or partner links to external websites
+Social media and contact links
+
+Phase 2: Validate Current Link Destinations
+For each external link:
+
+Test current destination - does it load correctly?
+Verify relevance - does the destination match the link context?
+Check for broken links - 404 errors or domain issues
+Confirm HTTPS usage - security best practices for external links
+Test link behavior - opens in new tab/window as appropriate
+
+Phase 3: MITRE ATT&CK Specific Validation
+Attack Technique Links:
+Expected Pattern:
+Link Text: "T1566.001 - Spearphishing Attachment"
+Destination: https://attack.mitre.org/techniques/T1566/001/
+
+Link Text: "T1078 - Valid Accounts" 
+Destination: https://attack.mitre.org/techniques/T1078/
+Validation Checklist:
+
+ All technique IDs format correctly (T#### or T####.###)
+ URLs construct properly with technique ID
+ Links open to correct MITRE ATT&CK pages
+ Subtechnique numbering is accurate (001, 002, etc.)
+
+Phase 4: VirusTotal Integration Testing
+API Connection Testing:
+
+Verify API key is properly configured in application settings
+Test API endpoints are accessible and responding
+Check rate limiting compliance and error handling
+Validate response parsing and data display
+
+Scan Functionality Testing:
+
+File upload scanning - test with sample files
+URL scanning - test with known URLs
+Hash lookup - test with file hashes if applicable
+Results interpretation - ensure scores and vendor results display correctly
+
+Integration Points to Verify:
+
+Scan trigger buttons actually initiate API calls
+Loading indicators show during API processing
+Results display properly formats VirusTotal response data
+Error messages appear for failed scans or API issues
+
+Implementation Guidelines
+Link Target Behavior
+Security Best Practices:
+
+External links should open in new tabs (target="_blank")
+Add security attributes: rel="noopener noreferrer" for external links
+HTTPS enforcement for all external destinations where available
+Link validation before deployment
+
+VirusTotal API Best Practices
+Rate Limiting Compliance:
+
+Implement request throttling to avoid API limits
+Cache results to minimize redundant API calls
+Provide user feedback during API processing delays
+Handle quota exceeded errors gracefully
+
+Data Privacy:
+
+User consent for external API submissions (if applicable)
+Data retention policies for scan results
+Clear messaging about what data is shared with VirusTotal
+
+Quality Assurance Testing
+Functional Testing Checklist
+
+ All MITRE ATT&CK links redirect to correct technique pages
+ VirusTotal API integration successfully scans and returns results
+ External documentation links work and are relevant
+ Social media and contact links function properly
+ All buttons with external destinations work as intended
+
+Error Handling Validation
+
+ Broken external links show appropriate error messages
+ VirusTotal API failures are handled gracefully
+ Network connectivity issues don't crash the application
+ Rate limit exceeded scenarios are managed properly
+
+Security Validation
+
+ External links use proper security attributes
+ No sensitive data is leaked through external links
+ VirusTotal API key is properly secured
+ User privacy is maintained during external interactions
+
+Success Criteria
+VirusTotal Integration Success
+
+API calls execute successfully and return real scan data
+Results display clearly and accurately in the application interface
+Error handling provides useful feedback for any API issues
+Performance maintains acceptable response times
+
+External Link Success
+
+100% of external links redirect to their intended destinations
+MITRE ATT&CK references link directly to corresponding technique pages
+Security best practices implemented for all external navigation
+User experience is smooth with appropriate new tab behavior
+
+
+Critical Note: Test thoroughly in a development environment before deploying changes. Verify that VirusTotal API integration doesn't impact application performance and that all external links enhance rather than detract from user workflow.
